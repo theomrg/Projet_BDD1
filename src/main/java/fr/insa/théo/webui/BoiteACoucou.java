@@ -48,7 +48,7 @@ public class BoiteACoucou extends VerticalLayout {
         this.tamessage = new TextArea();
         this.tamessage.setWidth("75%");
         this.tamessage.setHeight("20em");
-        this.bcoucou = new Button("coucou");
+        this.bcoucou = new Button("coucou2222");
         this.bcoucou.getStyle().set("color", "red");
         this.bcoucou.addClickListener((t) -> {
             String nom = this.tfnom.getValue();
