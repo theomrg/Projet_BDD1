@@ -85,7 +85,6 @@ public static void testcreer() {
         Joueur j = new Joueur("Test","A",180);
         System.out.println(j);
         j.saveInDB(ConnectionSimpleSGBD.defaultCon());
-        j.saveSansId(ConnectionSimpleSGBD.defaultCon());
     } catch (SQLException ex) {
         throw new Error(ex);    
         }
