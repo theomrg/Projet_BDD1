@@ -26,17 +26,21 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.utils.database.ConnectionPool;
+import fr.insa.beuvron.vaadin.utils.dataGrid.ResultSetGrid;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author theom
  */
-@Route(value="BAC")
+@Route(value = "BAC")
 public class BoiteACoucou extends VerticalLayout {
+
     private TextField tfnom;
     private TextArea tamessage;
     private Button bcoucou;
@@ -52,35 +56,47 @@ public class BoiteACoucou extends VerticalLayout {
         this.bcoucou.getStyle().set("color", "red");
         this.bcoucou.addClickListener((t) -> {
             String nom = this.tfnom.getValue();
-            append(this.tamessage,"coucou " + nom + "\n" );
+            append(this.tamessage, "coucou " + nom + "\n");
             try (Connection con = ConnectionPool.getConnection()) {
                 //select categorie from joueur where surnom = 'toto'
                 PreparedStatement pst = con.prepareStatement(
-                "select categorie from joueur where surnom = ?");
+                        "select categorie from joueur where surnom = ?");
                 pst.setString(1, nom);
                 ResultSet res = pst.executeQuery();
                 if (res.next()) {
                     String cat = res.getString("categorie");
-                    append(this.tamessage,"vous êtes catégorie" + cat);
-                
-                    
+                    append(this.tamessage, "vous êtes catégorie" + cat);
+
                 } else {
-                    append(this.tamessage,"vous n'existez pas");
+                    append(this.tamessage, "vous n'existez pas");
                 }
-                
+
             } catch (SQLException ex) {
-                Notification.show("problème : "+ ex.getMessage());
+                Notification.show("problème : " + ex.getMessage());
             }
         });
         this.bsalut = new BoutonImportant("salut");
-        this.hlbutton = new HorizontalLayout(this.bcoucou,this.bsalut);
-        this.add(this.tfnom,this.tamessage,this.hlbutton);
-        
+        this.hlbutton = new HorizontalLayout(this.bcoucou, this.bsalut);
+        this.add(this.tfnom, this.tamessage, this.hlbutton);
+
+        int ideq =2;
+        try (Connection con = ConnectionPool.getConnection()) {
+            PreparedStatement pst = con.prepareStatement(
+                    "select equipe.id,equipe.score,matchs.id,matchs.ronde\n"
+                    + "from equipe\n"
+                    + "  join matchs on equipe.idmatch = matchs.id\n"
+                    + "  where equipe.id = ?");
+            pst.setInt(1, ideq);
+            ResultSetGrid gr = new ResultSetGrid(pst);
+            this.add(gr);
+        } catch (SQLException ex) {
+            Notification.show("Problème : " + ex.getLocalizedMessage());
+        }
 
     }
-    public static void append(TextArea ou,String quoi) {
-        ou.setValue(ou.getValue()+quoi);
+
+    public static void append(TextArea ou, String quoi) {
+        ou.setValue(ou.getValue() + quoi);
     }
-    
-    
+
 }
