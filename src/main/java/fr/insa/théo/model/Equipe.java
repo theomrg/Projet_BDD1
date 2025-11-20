@@ -32,10 +32,10 @@ public class Equipe extends ClasseMiroir {
     private int score;
     private int idmatch;
             
-    public Equipe(int num, int score) {
+    public Equipe(int num, int score, Match match) {
         this.num = num;
         this.score = score;
-        this.idmatch= getId();
+        this.idmatch= match.getId();
     }
 
     public int getNum() {
