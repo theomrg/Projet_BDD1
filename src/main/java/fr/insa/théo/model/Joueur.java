@@ -82,7 +82,7 @@ private int taillecm;
     
 public static void testcreer() {
     try { //essaye de faire ça//
-        Joueur j = new Joueur("Test","A",180);
+        Joueur j = new Joueur("Test2","B",170);
         System.out.println(j);
         j.saveInDB(ConnectionSimpleSGBD.defaultCon());
     } catch (SQLException ex) {

@@ -29,7 +29,7 @@ import java.sql.Statement;
  * @author tmaringer01
  */
 public class Match extends ClasseMiroir {
-    private int rondes;
+    private int rondes; 
     
 public Match(int rondes) {
     super();
@@ -61,8 +61,8 @@ public String toString() {
 
     @Override
     protected Statement saveSansId(Connection con) throws SQLException {
-        PreparedStatement pst=con.prepareStatement("insert into match (rondes) values (?)", PreparedStatement.RETURN_GENERATED_KEYS);
-             pst.setInt(1, this.rondes);
+        PreparedStatement pst=con.prepareStatement("insert into matchs (ronde) values (?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, this.rondes);
             pst.executeUpdate();
             return pst;
         
@@ -70,10 +70,9 @@ public String toString() {
     
 public static void testcreer() {
     try { //essaye de faire ça//
-        Match match1 = new Match(1,3);
+        Match match1 = new Match(3);
         System.out.println(match1);
         match1.saveInDB(ConnectionSimpleSGBD.defaultCon());
-        System.out.println(match1);
     } catch (SQLException ex) {
         throw new Error(ex);    
         }
