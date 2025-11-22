@@ -50,11 +50,11 @@ public class MainView extends VerticalLayout {
     private Button bcoucou;
     private BoutonOnglet bsalut;
     private HorizontalLayout hlbutton;
-    private Tabs ongletsmanager;
-    private Tab onglet;
-
+    private Div contenu;
+    
     public MainView() {
-        this.tfnom = new TextField("nom");
+        
+    this.tfnom = new TextField("nom");
         this.tamessage = new TextArea();
         this.tamessage.setWidth("75%");
         this.tamessage.setHeight("20em");
@@ -98,27 +98,17 @@ public class MainView extends VerticalLayout {
         } catch (SQLException ex) {
             Notification.show("Problème : " + ex.getLocalizedMessage());
         }
-        
-    
-    this.ongletsmanager= new Tabs();
-    Tab tab1 = new Tab("Accueil");
-    Tab tab2 = new Tab("Profil");
-    Tab tab3 = new Tab("Paramètres");
-    ongletsmanager.add(tab1, tab2, tab3);
-    
-    Div contenu = new Div(); // zone d'affichage
+    BoutonOnglet accueilBtn = new BoutonOnglet("Accueil");
+    BoutonOnglet profilBtn = new BoutonOnglet("Profil");
+    BoutonOnglet paramètresBtn = new BoutonOnglet("Paramètres");
+    this.contenu = new Div(); // zone d'affichage
     contenu.setWidthFull();
     contenu.setHeight("200px");
     contenu.getStyle().set("border", "1px solid #ccc");
     contenu.getStyle().set("padding", "20px");
     contenu.getStyle().set("margin-top", "10px");
 
-     // Boutons "onglets"
-    BoutonOnglet accueilBtn = new BoutonOnglet("Accueil");
-    BoutonOnglet profilBtn = new BoutonOnglet("Profil");
-    BoutonOnglet paramètresBtn = new BoutonOnglet("Paramètres");
-
-   accueilBtn.addClickListener(e -> {
+    accueilBtn.addClickListener(e -> {
             contenu.removeAll();
             contenu.add(new Span("Bienvenue sur l'accueil "));
         });
@@ -139,11 +129,14 @@ public class MainView extends VerticalLayout {
 
         // Ajout à la vue principale
         add(barreOnglets, contenu);
+        
+        
+        
+        
+        
+        
+        
     }
-
-    
-    
-    
     public static void append(TextArea ou, String quoi) {
         ou.setValue(ou.getValue() + quoi);
     }

@@ -55,7 +55,75 @@ public class BoutonOnglet extends Button {
             this.getStyle().remove("box-shadow");
         });
 
+ /*this.tfnom = new TextField("nom");
+        this.tamessage = new TextArea();
+        this.tamessage.setWidth("75%");
+        this.tamessage.setHeight("20em");
+        this.bcoucou = new Button("coucou");
+        this.bcoucou.getStyle().set("color", "red");
+        this.bcoucou.addClickListener((t) -> {
+            String nom = this.tfnom.getValue();
+            append(this.tamessage, "coucou " + nom + "\n");
+            try (Connection con = ConnectionPool.getConnection()) {
+                //select categorie from joueur where surnom = 'toto'
+                PreparedStatement pst = con.prepareStatement(
+                        "select categorie from joueur where surnom = ?");
+                pst.setString(1, nom);
+                ResultSet res = pst.executeQuery();
+                if (res.next()) {
+                    String cat = res.getString("categorie");
+                    append(this.tamessage, "vous êtes catégorie" + cat);
 
+                } else {
+                    append(this.tamessage, "vous n'existez pas");
+                }
+
+            } catch (SQLException ex) {
+                Notification.show("problème : " + ex.getMessage());
+            }
+        });
+        this.bsalut = new BoutonOnglet("salut");
+        this.hlbutton = new HorizontalLayout(this.bcoucou, this.bsalut);
+        this.add(this.tfnom, this.tamessage, this.hlbutton);
+
+        int ideq =2;
+        try (Connection con = ConnectionPool.getConnection()) {
+            PreparedStatement pst = con.prepareStatement(
+                    "select equipe.id,equipe.score,matchs.id,matchs.ronde\n"
+                    + "from equipe\n"
+                    + "  join matchs on equipe.idmatch = matchs.id\n"
+                    + "  where equipe.id = ?");
+            pst.setInt(1, ideq);
+            ResultSetGrid gr = new ResultSetGrid(pst);
+            this.add(gr);
+        } catch (SQLException ex) {
+            Notification.show("Problème : " + ex.getLocalizedMessage());
+        }
+     */  
+    
+    /*Tabs ongletsmanager = new Tabs();
+    Tab joueur = new Tab("Joueur");
+    Tab equipe = new Tab("Equipe");
+    Tab matchs= new Tab("Matchs");
+    ongletsmanager.add(joueur, equipe, matchs);
+    
+    this.contenu = new Div(); // zone d'affichage
+    contenu.setWidthFull();
+    contenu.setHeight("200px");
+    contenu.getStyle().set("border", "1px solid #ccc");
+    contenu.getStyle().set("padding", "20px");
+    contenu.getStyle().set("margin-top", "10px");
+    ongletsmanager.addSelectedChangeListener(event -> {
+    contenu.removeAll();
+    Tab selected = event.getSelectedTab();
+    if (selected.equals(joueur)) {
+        contenu.add(new Span("Bienvenue sur l'accueil"));
+    } else if (selected.equals(equipe)) {
+        contenu.add(new Span("Voici ton profil"));
+    } else if (selected.equals(matchs)) {
+        contenu.add(new Span("Paramètres à venir"));
+    }
+});*/
  
 
     }
