@@ -37,6 +37,13 @@ private int taillecm;
         this.categorie = categorie;
         this.taillecm = taille;
     }
+    
+    public Joueur (int id, String surnom, String categorie, int taille) {
+        super(id);
+        this.surnom = surnom;
+        this.categorie = categorie;
+        this.taillecm = taille;
+    }
 
     public String getSurnom() {
         return surnom;

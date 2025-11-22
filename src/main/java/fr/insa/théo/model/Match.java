@@ -32,7 +32,6 @@ public class Match extends ClasseMiroir {
     private int rondes; 
     
 public Match(int rondes) {
-    super();
     this.rondes=rondes;
 }
 
@@ -70,7 +69,7 @@ public String toString() {
     
 public static void testcreer() {
     try { //essaye de faire ça//
-        Match match1 = new Match(3);
+        Match match1 = new Match(7);
         System.out.println(match1);
         match1.saveInDB(ConnectionSimpleSGBD.defaultCon());
     } catch (SQLException ex) {

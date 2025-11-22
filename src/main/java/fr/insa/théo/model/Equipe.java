@@ -22,7 +22,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 /**
  *
  * @author theom
@@ -37,6 +36,14 @@ public class Equipe extends ClasseMiroir {
         this.score = score;
         this.idmatch= match.getId();
     }
+    
+    public Equipe(int id, int num, int score, Match match) {
+        super(id);
+        this.num = num;
+        this.score = score;
+        this.idmatch= match.getId(); 
+    }
+    
 
     public int getNum() {
         return num;
@@ -56,19 +63,41 @@ public class Equipe extends ClasseMiroir {
 
     @Override
     public String toString() {
-        return "Equipe{" + "num=" + num + ", score=" + score + '}';
+        return "Equipe{" + "num=" + num + ", score=" + score + ", idmatch=" + idmatch + '}';
     }
+
+  
 
     @Override
     protected Statement saveSansId(Connection con) throws SQLException {
-        PreparedStatement pst=con.prepareStatement("insert into equipe (num, score, ) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+        PreparedStatement pst=con.prepareStatement("insert into equipe (num, score, idmatch) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pst.setInt(1, this.num);
             pst.setInt(2, this.score);
+            pst.setInt(3, this.idmatch);
             pst.executeUpdate();
             return pst;
     }
 
+public static void testcreer() {
+    try { //essaye de faire ça//
+        Match match1 = new Match(7);
+        match1.saveInDB(ConnectionSimpleSGBD.defaultCon());
+        Equipe e1 = new Equipe(7,15,match1);
+        System.out.println(e1);
+        e1.saveInDB(ConnectionSimpleSGBD.defaultCon());
+        
+    } catch (SQLException ex) {
+        throw new Error(ex);    
+        }
+}
+    
+    public static void main(String[] args) {
+        testcreer();
   
+        
+        
+        
+    }  
 
 
     
