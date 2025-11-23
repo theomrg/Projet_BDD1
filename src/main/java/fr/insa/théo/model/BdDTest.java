@@ -100,6 +100,14 @@ public class BdDTest {
             pst.setInt(2, 2);
             pst.executeUpdate();
         }
+         try (PreparedStatement pst = con.prepareStatement("insert into utilisateurs(idutilisateur,mdp) values (?,?)")) {
+            pst.setString(1, "m3_tmaringer01");
+            pst.setString(2, "8120c063");
+            pst.executeUpdate();
+            pst.setString(1, "m3_alefevre01");
+            pst.setString(2, "123456"); 
+            pst.executeUpdate();
+         }
     }
 
     public BdDTest() {

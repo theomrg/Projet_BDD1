@@ -23,14 +23,13 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import fr.insa.beuvron.vaadin.utils.dataGrid.ResultSetGrid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +39,7 @@ import java.sql.SQLException;
  *
  * @author theom
  */
-@Route(value = "BAC")
+@Route(value = "Projet")
 
 
 public class MainView extends VerticalLayout {
@@ -53,8 +52,42 @@ public class MainView extends VerticalLayout {
     private Div contenu;
     
     public MainView() {
+    
+        BoutonOnglet joueurBtn = new BoutonOnglet("Joueurs");
+        BoutonOnglet equipeBtn = new BoutonOnglet("Equipes");
+        BoutonOnglet matchsBtn = new BoutonOnglet("Matchs");
+        this.contenu = new Div(); // zone d'affichage
+        contenu.setWidthFull();
+        contenu.setHeight("200px");
+        contenu.getStyle().set("border", "1px solid #ccc");
+        contenu.getStyle().set("padding", "20px");
+        contenu.getStyle().set("margin-top", "10px");
+
+        joueurBtn.addClickListener(e -> {
+        contenu.removeAll();
+        contenu.add(new Span("Liste des joueurs participant au tournoi"));
+            });
+
+        equipeBtn.addClickListener(e -> {
+        contenu.removeAll();
+        contenu.add(new Span("Liste des équipes"));
+        });
+
+        matchsBtn.addClickListener(e -> {
+        contenu.removeAll();
+        contenu.add(new Span("Résultats des matchs"));
+        });
+
+        // Barre de navigation horizontale
+        HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn, equipeBtn, matchsBtn);
+        barreOnglets.setWidthFull();
+        barreOnglets.setSpacing(true);
+        barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         
-    this.tfnom = new TextField("nom");
+        // Ajout à la vue principale
+        add(barreOnglets, contenu);
+           
+        this.tfnom = new TextField("Surnom");   
         this.tamessage = new TextArea();
         this.tamessage.setWidth("75%");
         this.tamessage.setHeight("20em");
@@ -64,7 +97,6 @@ public class MainView extends VerticalLayout {
             String nom = this.tfnom.getValue();
             append(this.tamessage, "coucou " + nom + "\n");
             try (Connection con = ConnectionPool.getConnection()) {
-                //select categorie from joueur where surnom = 'toto'
                 PreparedStatement pst = con.prepareStatement(
                         "select categorie from joueur where surnom = ?");
                 pst.setString(1, nom);
@@ -98,43 +130,6 @@ public class MainView extends VerticalLayout {
         } catch (SQLException ex) {
             Notification.show("Problème : " + ex.getLocalizedMessage());
         }
-    BoutonOnglet accueilBtn = new BoutonOnglet("Accueil");
-    BoutonOnglet profilBtn = new BoutonOnglet("Profil");
-    BoutonOnglet paramètresBtn = new BoutonOnglet("Paramètres");
-    this.contenu = new Div(); // zone d'affichage
-    contenu.setWidthFull();
-    contenu.setHeight("200px");
-    contenu.getStyle().set("border", "1px solid #ccc");
-    contenu.getStyle().set("padding", "20px");
-    contenu.getStyle().set("margin-top", "10px");
-
-    accueilBtn.addClickListener(e -> {
-            contenu.removeAll();
-            contenu.add(new Span("Bienvenue sur l'accueil "));
-        });
-
-        profilBtn.addClickListener(e -> {
-            contenu.removeAll();
-            contenu.add(new Span("Voici ton profil utilisateur "));
-        });
-
-        paramètresBtn.addClickListener(e -> {
-            contenu.removeAll();
-            contenu.add(new Span("Paramètres de l'application ️"));
-        });
-
-        // Barre de navigation horizontale
-        HorizontalLayout barreOnglets = new HorizontalLayout(accueilBtn, profilBtn, paramètresBtn);
-        barreOnglets.setSpacing(true);
-
-        // Ajout à la vue principale
-        add(barreOnglets, contenu);
-        
-        
-        
-        
-        
-        
         
     }
     public static void append(TextArea ou, String quoi) {

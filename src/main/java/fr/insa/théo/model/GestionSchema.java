@@ -65,6 +65,10 @@ public class GestionSchema {
                         + " foreign key (idequipe) references equipe(id),"
                         + " foreign key (idjoueur) references joueur(id)"
                         + ") "   );
+                st.executeUpdate("create table utilisateurs ("
+                        + " idutilisateur varchar(20),"
+                        + " mdp varchar(20) "
+                        + ") "   );
                 
                 con.commit();
                 
@@ -116,6 +120,9 @@ public class GestionSchema {
                 st.executeUpdate("drop table matchs");
             } catch (SQLException ex) {
             }
+             try {
+                st.executeUpdate("drop table utilisateurs");
+            } catch (SQLException ex) { }
         }
     }
 
