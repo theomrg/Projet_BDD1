@@ -1,4 +1,4 @@
-.bouton-important {
+.bouton-onglet {
     background-color: #8e44ad;
     color: white;
     font-weight: bold;
@@ -7,7 +7,7 @@
     transition: all 0.3s ease;
 }
 
-.bouton-important:hover {
+.bouton-onglet:hover {
     background-color: #9b59b6;
     transform: scale(1.05);
     box-shadow: 0 6px 10px rgba(0,0,0,0.3);

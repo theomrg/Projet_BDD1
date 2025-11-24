@@ -67,7 +67,8 @@ public class GestionSchema {
                         + ") "   );
                 st.executeUpdate("create table utilisateurs ("
                         + " idutilisateur varchar(20),"
-                        + " mdp varchar(20) "
+                        + " mdp varchar(20), "
+                        + " profil varchar(20) "
                         + ") "   );
                 
                 con.commit();

@@ -28,7 +28,6 @@ import com.vaadin.flow.component.dependency.CssImport;
  *
  * @author theom
  */
-
 public class BoutonOnglet extends Button {
     public BoutonOnglet(String label) {
         super(label);

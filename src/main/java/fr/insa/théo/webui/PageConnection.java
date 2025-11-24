@@ -65,11 +65,9 @@ public class PageConnection extends VerticalLayout {
                 pst.setString(2, mdp);
                 ResultSet res = pst.executeQuery();
                 if (res.next()) {
-                // ✅ Utilisateur trouvé → redirection
                 UI.getCurrent().getPage().setLocation("http://localhost:8080/Projet");
 
             } else {
-                // ❌ Utilisateur non trouvé → message d'erreur
                 append(this.messageta, "Identifiant ou mot de passe incorect");
             }
             } catch (SQLException ex) {
