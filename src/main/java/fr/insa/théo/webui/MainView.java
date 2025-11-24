@@ -56,12 +56,30 @@ public class MainView extends VerticalLayout {
         BoutonOnglet joueurBtn = new BoutonOnglet("Joueurs");
         BoutonOnglet equipeBtn = new BoutonOnglet("Equipes");
         BoutonOnglet matchsBtn = new BoutonOnglet("Matchs");
-        this.contenu = new Div(); // zone d'affichage
+        this.contenu = new Div(); 
         contenu.setWidthFull();
-        contenu.setHeight("200px");
-        contenu.getStyle().set("border", "1px solid #ccc");
-        contenu.getStyle().set("padding", "20px");
-        contenu.getStyle().set("margin-top", "10px");
+        contenu.setHeight("250px"); // un peu plus d’espace
+
+        // Style général
+        contenu.getStyle()
+            .set("border-radius", "12px")
+            .set("border", "1px solid #8e44ad")
+            .set("padding", "25px")
+            .set("margin-top", "15px")
+            .set("background", "linear-gradient(135deg, #f5f5f5, #e0d4f7)")
+            .set("box-shadow", "0 4px 12px rgba(0, 0, 0, 0.1)")
+            .set("transition", "all 0.3s ease");
+
+        // Effet au survol (via JavaScript)
+        contenu.getElement().addEventListener("mouseover", e -> {
+            contenu.getStyle().set("transform", "scale(1.02)");
+            contenu.getStyle().set("box-shadow", "0 6px 18px rgba(0, 0, 0, 0.2)");
+        });
+        contenu.getElement().addEventListener("mouseout", e -> {
+            contenu.getStyle().remove("transform");
+            contenu.getStyle().set("box-shadow", "0 4px 12px rgba(0, 0, 0, 0.1)");
+        });
+
 
         joueurBtn.addClickListener(e -> {
         contenu.removeAll();
@@ -83,9 +101,8 @@ public class MainView extends VerticalLayout {
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
         barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        
         // Ajout à la vue principale
-        add(barreOnglets, contenu);
+       
            
         this.tfnom = new TextField("Surnom");   
         this.tamessage = new TextArea();
@@ -115,8 +132,7 @@ public class MainView extends VerticalLayout {
         });
         this.bsalut = new BoutonOnglet("salut");
         this.hlbutton = new HorizontalLayout(this.bcoucou, this.bsalut);
-        this.add(this.tfnom, this.tamessage, this.hlbutton);
-
+        this.add(barreOnglets, contenu, tfnom, tamessage, hlbutton);
         int ideq =2;
         try (Connection con = ConnectionPool.getConnection()) {
             PreparedStatement pst = con.prepareStatement(
