@@ -74,7 +74,7 @@ public static void créerMatch(int a) {
                 Match m= new Match(a);
                 m.saveInDB(ConnectionSimpleSGBD.defaultCon());
                 PreparedStatement pst = con.prepareStatement(
-                        "insert into matchs (ronde) values (?)");
+                        "insert into matchs (idronde) values (?)");
                 pst.setInt(1, a);
                 int res = pst.executeUpdate(); }
             catch (SQLException ex) {

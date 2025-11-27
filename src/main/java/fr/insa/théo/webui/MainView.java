@@ -26,10 +26,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import fr.insa.théo.model.Equipe;
 import fr.insa.théo.model.Match;
+import fr.insa.théo.model.Ronde;
 
 /**
  *
@@ -46,6 +45,8 @@ public class MainView extends VerticalLayout {
     private TextField tfnum;
     private TextField tfronde;
     private TextField tfscore;
+    private TextField tfnuméro;
+    private TextField tfstatut;
     private TextField tfidmatch;
     private Div contenu;
     
@@ -58,18 +59,46 @@ public class MainView extends VerticalLayout {
         this.tfronde = new TextField("Ronde");
         this.tfscore= new TextField("Score");
         this.tfidmatch = new TextField("Id du match");
+        this.tfnuméro= new TextField("Numéro de la ronde");
+        this.tfstatut = new TextField("Statut");
+        
         BoutonOnglet confirmerbtn = new BoutonOnglet("Confirmer");
         HorizontalLayout setattributs = new HorizontalLayout();
         BoutonOnglet ajoutjoueurbtn = new BoutonOnglet("Ajouter un joueur");
         BoutonOnglet ajoutéquipebtn = new BoutonOnglet("Ajouter une équipe");
         BoutonOnglet ajoutmatchbtn = new BoutonOnglet("Ajouter un match");
+        BoutonOnglet créerrondebtn = new BoutonOnglet("Créer une ronde");
         BoutonOnglet joueurBtn = new BoutonOnglet("Joueurs");
         BoutonOnglet equipeBtn = new BoutonOnglet("Equipes");
         BoutonOnglet matchsBtn = new BoutonOnglet("Matchs");
+        BoutonOnglet rondeBtn = new BoutonOnglet("Ronde");
+        
         this.contenu = new Div(); 
         contenu.addClassName("contenu");
         contenu.setWidthFull();
         contenu.setHeight("250px");
+        
+        
+        rondeBtn.addClickListener(v -> {
+        contenu.removeAll();
+        contenu.add(créerrondebtn); 
+        créerrondebtn.addClickListener(t -> {
+            setattributs.removeAll();
+            setattributs.add(this.tfnuméro,this.tfstatut);
+            contenu.add(setattributs);
+            contenu.add(confirmerbtn);
+            confirmerbtn.addClickListener(a -> {
+                int numéro = Integer.parseInt(tfnuméro.getValue());
+                String statut =tfstatut.getValue();
+                Ronde.créerRonde(numéro, statut);
+                  });
+              });
+        
+        
+        });
+        
+        
+        
         
         
         joueurBtn.addClickListener(e -> {
@@ -118,11 +147,12 @@ public class MainView extends VerticalLayout {
                 Match.créerMatch(ronde);
             });
          });
-        
         });
+        
+        
 
         // Barre de navigation horizontale
-        HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn, equipeBtn, matchsBtn);
+        HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn, equipeBtn, matchsBtn,rondeBtn);
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
         barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);

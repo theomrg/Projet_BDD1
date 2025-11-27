@@ -45,10 +45,17 @@ public class GestionSchema {
                         + " categorie varchar(1), "
                         + " taillecm int  "     
                         + ") "   );
+                st.executeUpdate("create table ronde ("
+                        + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
+                        + " numéro int,"
+                        + " statut varchar(20) "
+                        + ") "   );
                 
                 st.executeUpdate("create table matchs ("
                         + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
-                        + "ronde int not null"
+                        + " idronde int not null, "
+                        + " foreign key (idronde) references ronde(id)"
+                                
                         + ")" );
                 
                 st.executeUpdate("create table equipe ("
@@ -70,6 +77,7 @@ public class GestionSchema {
                         + " mdp varchar(20), "
                         + " profil varchar(20) "
                         + ") "   );
+           
                 
                 con.commit();
                 

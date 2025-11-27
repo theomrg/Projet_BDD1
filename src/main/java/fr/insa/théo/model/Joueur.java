@@ -98,7 +98,9 @@ public static void créerJoueur(String a,String b,int c) {
                 pst.setString(1, a);
                 pst.setString(2, b);
                 pst.setInt(3, c);
-                int res = pst.executeUpdate(); }
+                int res = pst.executeUpdate(); 
+                Notification.show("Le joueur " + j.surnom + " a été ajouté avec succès");
+     }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
 }
