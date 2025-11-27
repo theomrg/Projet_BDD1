@@ -32,27 +32,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 public class BoutonOnglet extends Button {
     public BoutonOnglet(String label) {
         super(label);
-
-        // Style de base (mauve)
-        this.getStyle().set("background-color", "#8e44ad");
-        this.getStyle().set("color", "white");
-        this.getStyle().set("font-weight", "bold");
-        this.getStyle().set("border-radius", "8px");
-        this.getStyle().set("padding", "10px 20px");
-        this.getStyle().set("transition", "all 0.3s ease");
-
-        // Hover : couleur plus claire
-        this.getElement().addEventListener("mouseover", e -> {
-            this.getStyle().set("background-color", "#9b59b6");
-            this.getStyle().set("transform", "scale(1.05)");
-            this.getStyle().set("box-shadow", "0 6px 10px rgba(0,0,0,0.3)");
-        });
-
-        // Mouse out : revenir au style initial
-        this.getElement().addEventListener("mouseout", e -> {
-            this.getStyle().set("background-color", "#8e44ad");
-            this.getStyle().remove("transform");
-            this.getStyle().remove("box-shadow");
-        });
+        addClassName("bouton-onglet");
+     
     }
 }

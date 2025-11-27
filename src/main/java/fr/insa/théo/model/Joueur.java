@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.model;
+import com.vaadin.flow.component.notification.Notification;
 import fr.insa.beuvron.utils.database.ClasseMiroir;
+import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -87,19 +89,22 @@ private int taillecm;
         
     }
     
-public static void testcreer() {
-    try { //essaye de faire ça//
-        Joueur j1 = new Joueur("Grabouillon","1",170);
-        System.out.println("Bienvenue aux nouveaux joueurs " + j1.surnom );
-        j1.saveInDB(ConnectionSimpleSGBD.defaultCon());
-        
-    } catch (SQLException ex) {
-        throw new Error(ex);    
-        }
+public static void créerJoueur(String a,String b,int c) {
+     try (Connection con = ConnectionPool.getConnection()) {
+                Joueur j = new Joueur(a,b,c);
+                j.saveInDB(ConnectionSimpleSGBD.defaultCon());
+                PreparedStatement pst = con.prepareStatement(
+                        "insert into joueur (surnom, categorie, taillecm) values (?,?,?)");
+                pst.setString(1, a);
+                pst.setString(2, b);
+                pst.setInt(3, c);
+                int res = pst.executeUpdate(); }
+            catch (SQLException ex) {
+                  Notification.show("problème : " + ex.getMessage()); }
 }
     
     public static void main(String[] args) {
-        testcreer();
+        
   
         
         

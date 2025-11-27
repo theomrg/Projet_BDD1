@@ -20,23 +20,16 @@ package fr.insa.théo.webui;
 import fr.insa.théo.model.Joueur;
 
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import fr.insa.beuvron.utils.database.ConnectionPool;
-import fr.insa.beuvron.vaadin.utils.dataGrid.ResultSetGrid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import fr.insa.théo.model.ConnectionSimpleSGBD;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import fr.insa.théo.model.Equipe;
+import fr.insa.théo.model.Match;
 
 /**
  *
@@ -50,6 +43,10 @@ public class MainView extends VerticalLayout {
     private TextField tfsurnom;
     private TextField tfcategorie;
     private TextField tftaillecm;
+    private TextField tfnum;
+    private TextField tfronde;
+    private TextField tfscore;
+    private TextField tfidmatch;
     private Div contenu;
     
     public MainView() {
@@ -57,63 +54,71 @@ public class MainView extends VerticalLayout {
         this.tfsurnom = new TextField("Surnom");
         this.tfcategorie = new TextField("Catégorie");
         this.tftaillecm = new TextField("Taille");
+        this.tfnum = new TextField("Nombre de joueurs");
+        this.tfronde = new TextField("Ronde");
+        this.tfscore= new TextField("Score");
+        this.tfidmatch = new TextField("Id du match");
         BoutonOnglet confirmerbtn = new BoutonOnglet("Confirmer");
-        HorizontalLayout setattributs = new HorizontalLayout(this.tfcategorie,this.tfsurnom,this.tftaillecm,confirmerbtn);
+        HorizontalLayout setattributs = new HorizontalLayout();
         BoutonOnglet ajoutjoueurbtn = new BoutonOnglet("Ajouter un joueur");
+        BoutonOnglet ajoutéquipebtn = new BoutonOnglet("Ajouter une équipe");
+        BoutonOnglet ajoutmatchbtn = new BoutonOnglet("Ajouter un match");
         BoutonOnglet joueurBtn = new BoutonOnglet("Joueurs");
         BoutonOnglet equipeBtn = new BoutonOnglet("Equipes");
         BoutonOnglet matchsBtn = new BoutonOnglet("Matchs");
         this.contenu = new Div(); 
+        contenu.addClassName("contenu");
         contenu.setWidthFull();
-        contenu.setHeight("250px"); // un peu plus d’espace
-
-        // Style général
-        contenu.getStyle()
-    .set("background", "#f8f4fc") // fond mauve très clair
-    .set("border", "1px solid #d3bce6") // bordure mauve pastel
-    .set("border-radius", "16px")
-    .set("padding", "30px")
-    .set("box-shadow", "0 8px 20px rgba(0,0,0,0.1)")
-    .set("font-family", "'Segoe UI', sans-serif")
-    .set("color", "#5e3c76") // texte mauve foncé
-    .set("transition", "all 0.3s ease");
-
+        contenu.setHeight("250px");
         
         
-
         joueurBtn.addClickListener(e -> {
         contenu.removeAll();
         contenu.add(ajoutjoueurbtn);
         ajoutjoueurbtn.addClickListener(t -> {
-          contenu.add(setattributs); 
-          confirmerbtn.addClickListener(a -> {
-            String surnom = tfsurnom.getValue();
-            String catégorie =tfcategorie.getValue();
-            int taillecm = Integer.parseInt(tftaillecm.getValue());
-
-            try (Connection con = ConnectionPool.getConnection()) {
-                Joueur j = new Joueur(surnom,catégorie,taillecm);
-                j.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                PreparedStatement pst = con.prepareStatement(
-                        "insert into joueur (surnom, categorie, taillecm) values (?,?,?)");
-                pst.setString(1, surnom);
-                pst.setString(2, catégorie);
-                pst.setInt(3, taillecm);
-                int res = pst.executeUpdate(); }
-            catch (SQLException ex) {
-                  Notification.show("problème : " + ex.getMessage()); }
+            setattributs.removeAll();
+            setattributs.add(this.tfcategorie,this.tfsurnom,this.tftaillecm);
+            contenu.add(setattributs);
+            contenu.add(confirmerbtn);
+            confirmerbtn.addClickListener(a -> {
+                String surnom = tfsurnom.getValue();
+                String catégorie =tfcategorie.getValue();
+                int taillecm = Integer.parseInt(tftaillecm.getValue());
+                Joueur.créerJoueur(surnom, catégorie, taillecm);
                   });
               });
           });
 
-        equipeBtn.addClickListener(e -> {
+        equipeBtn.addClickListener(a -> {
         contenu.removeAll();
-        contenu.add(new Span("Liste des équipes"));
+        contenu.add(ajoutéquipebtn);
+        ajoutéquipebtn.addClickListener(t -> {
+            setattributs.removeAll();
+            setattributs.add(this.tfnum,this.tfidmatch);
+            contenu.add(setattributs);
+            contenu.add(confirmerbtn);
+            confirmerbtn.addClickListener(x -> {
+                int num = Integer.parseInt(tfnum.getValue());
+                int idmatch = Integer.parseInt(tfidmatch.getValue());
+              
+            });
+         });
         });
 
         matchsBtn.addClickListener(e -> {
         contenu.removeAll();
-        contenu.add(new Span("Résultats des matchs"));
+        contenu.add(ajoutmatchbtn);
+        ajoutmatchbtn.addClickListener(t -> {
+            setattributs.removeAll();
+            setattributs.add(this.tfronde);
+            contenu.add(setattributs);
+            contenu.add(confirmerbtn);
+            confirmerbtn.addClickListener(x -> {
+                int ronde = Integer.parseInt(tfronde.getValue());
+                Match.créerMatch(ronde);
+            });
+         });
+        
         });
 
         // Barre de navigation horizontale

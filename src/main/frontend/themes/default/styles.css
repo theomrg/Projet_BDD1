@@ -1,1 +1,26 @@
 /* Add your styles here */
+.bouton-onglet {
+    background-color: #8e44ad;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.bouton-onglet:hover {
+    background-color: #9b59b6;
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.contenu {
+    background: #f8f4fc;              /* fond mauve très clair */
+    border: 1px solid #d3bce6;        /* bordure mauve pastel */
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', sans-serif;
+    color: #5e3c76;                   /* texte mauve foncé */
+    transition: all 0.3s ease;
+}

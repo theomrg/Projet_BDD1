@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.model;
+import com.vaadin.flow.component.notification.Notification;
 import fr.insa.beuvron.utils.database.ClasseMiroir;
+import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,8 +35,7 @@ public class Equipe extends ClasseMiroir {
             
     public Equipe(int num, int score, Match match) {
         this.num = num;
-        this.score = score;
-        this.idmatch= match.getId();
+        
     }
     
     public Equipe(int id, int num, int score, Match match) {
@@ -78,29 +79,22 @@ public class Equipe extends ClasseMiroir {
             return pst;
     }
 
-public static void testcreer() {
-    try { //essaye de faire ça//
-        Match match1 = new Match(7);
-        match1.saveInDB(ConnectionSimpleSGBD.defaultCon());
-        Equipe e1 = new Equipe(7,15,match1);
-        System.out.println(e1);
-        e1.saveInDB(ConnectionSimpleSGBD.defaultCon());
-        
-    } catch (SQLException ex) {
-        throw new Error(ex);    
-        }
+public static void créerEquipe(int a, Match match) {
+    try (Connection con = ConnectionPool.getConnection()) {
+                Equipe e = new Equipe(a,0,match);
+                e.saveInDB(ConnectionSimpleSGBD.defaultCon());
+                PreparedStatement pst = con.prepareStatement(
+                        "insert into equipe (num, score, idmatch) values (?,?,?)");
+                pst.setInt(1, a);
+                pst.setInt(2, 0);
+                pst.setInt(3, match.getId()); 
+                int res = pst.executeUpdate(); }
+            catch (SQLException ex) {
+                  Notification.show("problème : " + ex.getMessage()); }
 }
     
     public static void main(String[] args) {
-        testcreer();
-  
-        
-        
-        
+         
     }  
-
-
-    
-    
     
 }

@@ -110,6 +110,12 @@ public class BdDTest {
             pst.setString(3, "util");
             pst.executeUpdate();
          }
+         try (PreparedStatement pst = con.prepareStatement("insert into equipe(num) values (?)")) {
+             pst.setInt(1, 14);
+             pst.executeUpdate();
+             
+             
+         }
     }
 
     public BdDTest() {

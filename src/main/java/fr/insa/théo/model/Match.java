@@ -18,7 +18,9 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.model;
 
+import com.vaadin.flow.component.notification.Notification;
 import fr.insa.beuvron.utils.database.ClasseMiroir;
+import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -67,19 +69,19 @@ public String toString() {
         
     }
     
-public static void testcreer() {
-    try { //essaye de faire ça//
-        Match match1 = new Match(7);
-        System.out.println(match1);
-        match1.saveInDB(ConnectionSimpleSGBD.defaultCon());
-    } catch (SQLException ex) {
-        throw new Error(ex);    
-        }
+public static void créerMatch(int a) {
+    try (Connection con = ConnectionPool.getConnection()) {
+                Match m= new Match(a);
+                m.saveInDB(ConnectionSimpleSGBD.defaultCon());
+                PreparedStatement pst = con.prepareStatement(
+                        "insert into matchs (ronde) values (?)");
+                pst.setInt(1, a);
+                int res = pst.executeUpdate(); }
+            catch (SQLException ex) {
+                  Notification.show("problème : " + ex.getMessage()); }
 }
     
     public static void main(String[] args) {
-        testcreer();
-        
-        
+      
     }
 }
