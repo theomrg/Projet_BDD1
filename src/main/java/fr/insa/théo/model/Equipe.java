@@ -83,12 +83,7 @@ public static void créerEquipe(int a, Match match) {
     try (Connection con = ConnectionPool.getConnection()) {
                 Equipe e = new Equipe(a,0,match);
                 e.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                PreparedStatement pst = con.prepareStatement(
-                        "insert into equipe (num, score, idmatch) values (?,?,?)");
-                pst.setInt(1, a);
-                pst.setInt(2, 0);
-                pst.setInt(3, match.getId()); 
-                int res = pst.executeUpdate(); }
+               }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
 }

@@ -24,6 +24,7 @@ import fr.insa.beuvron.utils.database.ClasseMiroir;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -83,14 +84,25 @@ public class Ronde extends ClasseMiroir {
          try (Connection con = ConnectionPool.getConnection()) {
                 Ronde r = new Ronde(a,b);
                 r.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                PreparedStatement pst = con.prepareStatement(
-                        "insert into ronde (numéro,statut) values (?,?)");
-                pst.setInt(1, a);
-                pst.setString(2, b);
-                int res = pst.executeUpdate(); 
                 Notification.show("La ronde numéro" + r.numero + " a été ajouté avec succès");
      }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
-            }   
+            }  
+    
+    public static List<Ronde> getAllRondes() throws SQLException {
+    List<Ronde> listeRondes = new ArrayList<>();
+    
+    // On récupère la connexion (adaptez selon votre méthode de connexion)
+    try (Connection con = ConnectionPool.getConnection();
+         Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery("SELECT * FROM ronde")) {
+        while (rs.next()) {
+          Ronde r = new Ronde(rs.getInt("id"),rs.getInt("numéro"), rs.getString("statut")
+          );  
+          listeRondes.add(r);
+            }
+        }
+        return listeRondes;
+    }
 }

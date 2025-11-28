@@ -93,13 +93,7 @@ public static void créerJoueur(String a,String b,int c) {
      try (Connection con = ConnectionPool.getConnection()) {
                 Joueur j = new Joueur(a,b,c);
                 j.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                PreparedStatement pst = con.prepareStatement(
-                        "insert into joueur (surnom, categorie, taillecm) values (?,?,?)");
-                pst.setString(1, a);
-                pst.setString(2, b);
-                pst.setInt(3, c);
-                int res = pst.executeUpdate(); 
-                Notification.show("Le joueur " + j.surnom + " a été ajouté avec succès");
+                Notification.show("Le joueur " + a + " a été ajouté au tournoi");
      }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }

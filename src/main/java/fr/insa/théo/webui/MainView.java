@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
+import com.vaadin.flow.component.combobox.ComboBox;
 import fr.insa.théo.model.Joueur;
 
 
@@ -29,6 +30,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import fr.insa.théo.model.Match;
 import fr.insa.théo.model.Ronde;
+import java.sql.SQLException;
 
 /**
  *
@@ -49,6 +51,7 @@ public class MainView extends VerticalLayout {
     private TextField tfstatut;
     private TextField tfidmatch;
     private Div contenu;
+    private BoutonOnglet confirmer;
     
     public MainView() {
         
@@ -61,8 +64,9 @@ public class MainView extends VerticalLayout {
         this.tfidmatch = new TextField("Id du match");
         this.tfnuméro= new TextField("Numéro de la ronde");
         this.tfstatut = new TextField("Statut");
+        this.confirmer = new BoutonOnglet("Confirmer");
         
-        BoutonOnglet confirmerbtn = new BoutonOnglet("Confirmer");
+        ComboBox<Ronde> selecteurRonde = new ComboBox<>("Choisir la ronde");
         HorizontalLayout setattributs = new HorizontalLayout();
         BoutonOnglet ajoutjoueurbtn = new BoutonOnglet("Ajouter un joueur");
         BoutonOnglet ajoutéquipebtn = new BoutonOnglet("Ajouter une équipe");
@@ -82,25 +86,31 @@ public class MainView extends VerticalLayout {
         rondeBtn.addClickListener(v -> {
         contenu.removeAll();
         contenu.add(créerrondebtn); 
+        contenu.add(selecteurRonde);
+        try {
+        // 2. On remplit le composant avec la liste venant de la BDD
+        // (Remplacez par votre méthode réelle de récupération)
+        selecteurRonde.setItems(Ronde.getAllRondes());
+        } catch (SQLException ex) {
+         ex.printStackTrace(); }
+        selecteurRonde.setItemLabelGenerator(ronde -> 
+        "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ")"
+        );
+
         créerrondebtn.addClickListener(t -> {
             setattributs.removeAll();
             setattributs.add(this.tfnuméro,this.tfstatut);
             contenu.add(setattributs);
-            contenu.add(confirmerbtn);
-            confirmerbtn.addClickListener(a -> {
+            contenu.add(confirmer);
+            confirmer.addClickListener(a -> {
                 int numéro = Integer.parseInt(tfnuméro.getValue());
                 String statut =tfstatut.getValue();
                 Ronde.créerRonde(numéro, statut);
+                
                   });
-              });
-        
-        
+            });
         });
-        
-        
-        
-        
-        
+       
         joueurBtn.addClickListener(e -> {
         contenu.removeAll();
         contenu.add(ajoutjoueurbtn);
@@ -108,8 +118,8 @@ public class MainView extends VerticalLayout {
             setattributs.removeAll();
             setattributs.add(this.tfcategorie,this.tfsurnom,this.tftaillecm);
             contenu.add(setattributs);
-            contenu.add(confirmerbtn);
-            confirmerbtn.addClickListener(a -> {
+            contenu.add(confirmer);
+            confirmer.addClickListener(a -> {
                 String surnom = tfsurnom.getValue();
                 String catégorie =tfcategorie.getValue();
                 int taillecm = Integer.parseInt(tftaillecm.getValue());
@@ -125,8 +135,8 @@ public class MainView extends VerticalLayout {
             setattributs.removeAll();
             setattributs.add(this.tfnum,this.tfidmatch);
             contenu.add(setattributs);
-            contenu.add(confirmerbtn);
-            confirmerbtn.addClickListener(x -> {
+            contenu.add(confirmer);
+            confirmer.addClickListener(x -> {
                 int num = Integer.parseInt(tfnum.getValue());
                 int idmatch = Integer.parseInt(tfidmatch.getValue());
               
@@ -141,8 +151,8 @@ public class MainView extends VerticalLayout {
             setattributs.removeAll();
             setattributs.add(this.tfronde);
             contenu.add(setattributs);
-            contenu.add(confirmerbtn);
-            confirmerbtn.addClickListener(x -> {
+            contenu.add(confirmer);
+            confirmer.addClickListener(x -> {
                 int ronde = Integer.parseInt(tfronde.getValue());
                 Match.créerMatch(ronde);
             });

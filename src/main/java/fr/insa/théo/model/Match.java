@@ -31,39 +31,36 @@ import java.sql.Statement;
  * @author tmaringer01
  */
 public class Match extends ClasseMiroir {
-    private int rondes; 
+    private int idronde; 
+
+    public Match(int idronde) {
+    this.idronde = idronde;
+        }
     
-public Match(int rondes) {
-    this.rondes=rondes;
+    public Match(int id, int idronde) {
+        super(id);
+        this.idronde = idronde;
+    
+
 }
 
-public Match(int id, int rondes) {
-    super(id);
-    this.rondes=rondes;
-}
-
-public int getRondes(){
-    return rondes; 
-}
-
-public void setRondes(int rondes){
-    this.rondes=rondes;
-}    
-
-@Override
-public String toString() {
-        return "match{" + "id=" + this.getId() + ", rondes=" + rondes + '}';
+    public int getIdronde() {
+        return idronde;
     }
 
+    public void setIdronde(int idronde) {
+        this.idronde = idronde;
+    }
 
-   
-
-
+    @Override
+    public String toString() {
+        return "Match{" + "idronde=" + idronde + this.getId()+ '}';
+    }
 
     @Override
     protected Statement saveSansId(Connection con) throws SQLException {
-        PreparedStatement pst=con.prepareStatement("insert into matchs (ronde) values (?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, this.rondes);
+        PreparedStatement pst=con.prepareStatement("insert into matchs (idronde) values (?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, this.idronde);
             pst.executeUpdate();
             return pst;
         
@@ -73,10 +70,8 @@ public static void créerMatch(int a) {
     try (Connection con = ConnectionPool.getConnection()) {
                 Match m= new Match(a);
                 m.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                PreparedStatement pst = con.prepareStatement(
-                        "insert into matchs (idronde) values (?)");
-                pst.setInt(1, a);
-                int res = pst.executeUpdate(); }
+                Notification.show("Match créé ! Appartient à la ronde " + a);
+                }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
 }
