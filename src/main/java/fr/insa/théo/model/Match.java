@@ -66,11 +66,11 @@ public class Match extends ClasseMiroir {
         
     }
     
-public static void créerMatch(int a) {
+public static void créerMatch(Ronde r) {
     try (Connection con = ConnectionPool.getConnection()) {
-                Match m= new Match(a);
-                m.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                Notification.show("Match créé ! Appartient à la ronde " + a);
+                Match m= new Match(r.getId());
+                m.saveInDB(ConnectionPool.getConnection());
+                Notification.show("Match créé ! Appartient à la ronde " + r.getNumero());
                 }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }

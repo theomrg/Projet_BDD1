@@ -132,6 +132,9 @@ public class GestionSchema {
              try {
                 st.executeUpdate("drop table utilisateurs");
             } catch (SQLException ex) { }
+             try {
+                st.executeUpdate("drop table ronde");
+            } catch (SQLException ex) { }
         }
     }
 

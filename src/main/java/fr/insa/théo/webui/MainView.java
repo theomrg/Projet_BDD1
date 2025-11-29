@@ -22,6 +22,7 @@ import fr.insa.théo.model.Joueur;
 
 
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -59,7 +60,7 @@ public class MainView extends VerticalLayout {
         this.tfcategorie = new TextField("Catégorie");
         this.tftaillecm = new TextField("Taille");
         this.tfnum = new TextField("Nombre de joueurs");
-        this.tfronde = new TextField("Ronde");
+        this.tfronde = new TextField("ID de la Ronde");
         this.tfscore= new TextField("Score");
         this.tfidmatch = new TextField("Id du match");
         this.tfnuméro= new TextField("Numéro de la ronde");
@@ -94,9 +95,8 @@ public class MainView extends VerticalLayout {
         } catch (SQLException ex) {
          ex.printStackTrace(); }
         selecteurRonde.setItemLabelGenerator(ronde -> 
-        "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ")"
+        "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ") " + "id : " + ronde.getId()
         );
-
         créerrondebtn.addClickListener(t -> {
             setattributs.removeAll();
             setattributs.add(this.tfnuméro,this.tfstatut);
@@ -149,18 +149,16 @@ public class MainView extends VerticalLayout {
         contenu.add(ajoutmatchbtn);
         ajoutmatchbtn.addClickListener(t -> {
             setattributs.removeAll();
-            setattributs.add(this.tfronde);
-            contenu.add(setattributs);
-            contenu.add(confirmer);
-            confirmer.addClickListener(x -> {
-                int ronde = Integer.parseInt(tfronde.getValue());
-                Match.créerMatch(ronde);
+            Ronde rondeSelectionnee = selecteurRonde.getValue();
+            if (rondeSelectionnee != null) {
+                // On appelle la méthode modifiée en passant tout l'objet
+                Match.créerMatch(rondeSelectionnee); 
+            } else {
+                Notification.show("Veuillez sélectionner une ronde d'abord !");
+                }
             });
-         });
         });
         
-        
-
         // Barre de navigation horizontale
         HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn, equipeBtn, matchsBtn,rondeBtn);
         barreOnglets.setWidthFull();
