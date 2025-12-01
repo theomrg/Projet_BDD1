@@ -162,22 +162,26 @@ public abstract class ClasseMiroir {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if (obj == null) {
-            return false;
-        } else if (getClass() != obj.getClass()) {
-            return false;
-        } else if (this.id == -1) {
-            throw new EntiteNonSauvegardee();
-        }
-        ClasseMiroir other = (ClasseMiroir) obj;
-        if (other.id != -1) {
-            throw new EntiteNonSauvegardee();
-        } else {
-            return this.id == other.id;
-        }
+   public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    
+    // Si MOI je n'ai pas d'ID, on ne peut pas me comparer
+    if (this.id == -1) {
+        throw new EntiteNonSauvegardee();
     }
+    
+    ClasseMiroir other = (ClasseMiroir) obj;
+    
+    // === CORRECTION ICI ===
+    // AVANT (Faux) : if (other.id != -1) { throw ... }
+    // MAINTENANT (Juste) :
+    if (other.id == -1) { // Si l'AUTRE n'a pas d'ID, erreur
+        throw new EntiteNonSauvegardee();
+    } else {
+        return this.id == other.id; // On compare les IDs
+    }
+}
 
 }

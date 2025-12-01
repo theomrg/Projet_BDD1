@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
 import fr.insa.théo.model.Joueur;
 
@@ -29,6 +30,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.router.PageTitle;
 import fr.insa.théo.model.Match;
 import fr.insa.théo.model.Ronde;
 import java.sql.SQLException;
@@ -37,10 +39,11 @@ import java.sql.SQLException;
  *
  * @author theom
  */
-@Route(value = "Projet")
+@Route(value = "Accueil")
+@PageTitle("Accueil")
 
 
-public class MainView extends VerticalLayout {
+public class Accueil extends VerticalLayout {
 
     private TextField tfsurnom;
     private TextField tfcategorie;
@@ -54,7 +57,7 @@ public class MainView extends VerticalLayout {
     private Div contenu;
     private BoutonOnglet confirmer;
     
-    public MainView() {
+    public Accueil() {
         
         this.tfsurnom = new TextField("Surnom");
         this.tfcategorie = new TextField("Catégorie");
@@ -69,46 +72,21 @@ public class MainView extends VerticalLayout {
         
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Choisir la ronde");
         HorizontalLayout setattributs = new HorizontalLayout();
-        BoutonOnglet ajoutjoueurbtn = new BoutonOnglet("Ajouter un joueur");
-        BoutonOnglet ajoutéquipebtn = new BoutonOnglet("Ajouter une équipe");
-        BoutonOnglet ajoutmatchbtn = new BoutonOnglet("Ajouter un match");
-        BoutonOnglet créerrondebtn = new BoutonOnglet("Créer une ronde");
+        BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur");
+        BoutonAjout ajoutéquipebtn = new BoutonAjout("Ajouter une équipe");
+        BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
+        BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
         BoutonOnglet joueurBtn = new BoutonOnglet("Joueurs");
-        BoutonOnglet equipeBtn = new BoutonOnglet("Equipes");
-        BoutonOnglet matchsBtn = new BoutonOnglet("Matchs");
-        BoutonOnglet rondeBtn = new BoutonOnglet("Ronde");
-        
+        BoutonOnglet gestionTournoiBtn = new BoutonOnglet("Gérer le tournoi");
         this.contenu = new Div(); 
         contenu.addClassName("contenu");
         contenu.setWidthFull();
         contenu.setHeight("250px");
         
         
-        rondeBtn.addClickListener(v -> {
-        contenu.removeAll();
-        contenu.add(créerrondebtn); 
-        contenu.add(selecteurRonde);
-        try {
-        // 2. On remplit le composant avec la liste venant de la BDD
-        // (Remplacez par votre méthode réelle de récupération)
-        selecteurRonde.setItems(Ronde.getAllRondes());
-        } catch (SQLException ex) {
-         ex.printStackTrace(); }
-        selecteurRonde.setItemLabelGenerator(ronde -> 
-        "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ") " + "id : " + ronde.getId()
-        );
-        créerrondebtn.addClickListener(t -> {
-            setattributs.removeAll();
-            setattributs.add(this.tfnuméro,this.tfstatut);
-            contenu.add(setattributs);
-            contenu.add(confirmer);
-            confirmer.addClickListener(a -> {
-                int numéro = Integer.parseInt(tfnuméro.getValue());
-                String statut =tfstatut.getValue();
-                Ronde.créerRonde(numéro, statut);
-                
-                  });
-            });
+        gestionTournoiBtn.addClickListener(v -> {
+            UI.getCurrent().getPage().setLocation("http://localhost:8080/GestionTournoi");
+        
         });
        
         joueurBtn.addClickListener(e -> {
@@ -128,7 +106,7 @@ public class MainView extends VerticalLayout {
               });
           });
 
-        equipeBtn.addClickListener(a -> {
+        /*equipeBtn.addClickListener(a -> {
         contenu.removeAll();
         contenu.add(ajoutéquipebtn);
         ajoutéquipebtn.addClickListener(t -> {
@@ -142,25 +120,11 @@ public class MainView extends VerticalLayout {
               
             });
          });
-        });
+        }); */
 
-        matchsBtn.addClickListener(e -> {
-        contenu.removeAll();
-        contenu.add(ajoutmatchbtn);
-        ajoutmatchbtn.addClickListener(t -> {
-            setattributs.removeAll();
-            Ronde rondeSelectionnee = selecteurRonde.getValue();
-            if (rondeSelectionnee != null) {
-                // On appelle la méthode modifiée en passant tout l'objet
-                Match.créerMatch(rondeSelectionnee); 
-            } else {
-                Notification.show("Veuillez sélectionner une ronde d'abord !");
-                }
-            });
-        });
         
         // Barre de navigation horizontale
-        HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn, equipeBtn, matchsBtn,rondeBtn);
+        HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn,gestionTournoiBtn);
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
         barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);

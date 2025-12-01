@@ -26,7 +26,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.utils.database.ConnectionPool;
-import static fr.insa.théo.webui.MainView.append;
+import static fr.insa.théo.webui.Accueil.append;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +38,7 @@ import java.sql.SQLException;
  * @author francois
  */
 @Route(value = "")
-@PageTitle("Likes")
+@PageTitle("Connection")
 public class PageConnection extends VerticalLayout {
      private TextField idtf;
      private TextField mdptf;

@@ -1,3 +1,11 @@
+:root {
+    --glass-background: rgba(255, 255, 255, 0.2); /* Fond blanc transparent */
+    --glass-border-color: rgba(255, 255, 255, 0.5); /* Bordure semi-transparente */
+    --glass-shadow: rgba(0, 0, 0, 0.1); /* Ombre légère */
+    --glass-text-color: #ffffff; /* Texte blanc pour contraster avec le fond flou */
+    --mauve-start: #f0e6ff; /* Lavande très clair */
+    --mauve-end: #d0bfff; /* Violet clair */
+}
 .bouton-onglet {
     background-color: #8e44ad;
     color: white;
@@ -13,3 +21,38 @@
     box-shadow: 0 6px 10px rgba(0,0,0,0.3);
 }
 
+.glass-button {
+    /* 1. Transparence et Flou (L'effet "verre") */
+    background: var(--glass-background);
+    backdrop-filter: blur(10px); /* Applique un flou à l'arrière-plan du bouton */
+
+    
+    /* 2. Forme et Bordure */
+    border: 1px solid var(--glass-border-color);
+    border-radius: 12px; /* Coins arrondis pour un look moderne */
+    padding: 10px 20px;
+    
+    /* 3. Texte et Ombre */
+    color: var(--glass-text-color);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--glass-shadow); /* Ombre très subtile sur le texte */
+    box-shadow: 0 4px 6px var(--glass-shadow); /* Ombre douce sous le bouton */
+    
+    /* Transition pour l'effet de survol (hover) */
+    transition: all 0.3s ease;
+}
+
+/* Effet de survol (Hover) */
+.glass-button:hover {
+    background: rgba(255, 255, 255, 0.3); /* Légèrement plus opaque au survol */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
+    transform: translateY(-2px); /* Léger déplacement vers le haut */
+    cursor: pointer;
+}
+
+/* Effet de clic (Active) */
+.glass-button:active {
+    background: rgba(255, 255, 255, 0.1); /* Devient très transparent au clic */
+    transform: translateY(0); /* Retour à la position initiale */
+    box-shadow: none;
+}
