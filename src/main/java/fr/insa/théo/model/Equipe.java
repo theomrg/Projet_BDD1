@@ -22,6 +22,7 @@ import fr.insa.beuvron.utils.database.ClasseMiroir;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 /**
@@ -33,16 +34,18 @@ public class Equipe extends ClasseMiroir {
     private int score;
     private int idmatch;
             
-    public Equipe(int num, int score, Match match) {
+    public Equipe(int num, int score, int idmatch) {
         this.num = num;
+        this.score = score;
+        this.idmatch = idmatch;
         
     }
     
-    public Equipe(int id, int num, int score, Match match) {
+    public Equipe(int id, int num, int score, int idmatch) {
         super(id);
         this.num = num;
         this.score = score;
-        this.idmatch= match.getId(); 
+        this.idmatch= idmatch; 
     }
     
 
@@ -79,13 +82,32 @@ public class Equipe extends ClasseMiroir {
             return pst;
     }
 
-public static void créerEquipe(int a, Match match) {
+public static void créerEquipe(int a, Match m) {
     try (Connection con = ConnectionPool.getConnection()) {
-                Equipe e = new Equipe(a,0,match);
+                Equipe e = new Equipe(a,0,m.getId());
                 e.saveInDB(ConnectionSimpleSGBD.defaultCon());
+                Notification.show("Equipe créée ! Appartient au match " + m.getId());
                }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
+}
+public static int getNbEquipesParMatch(int idMatch) throws SQLException {
+    // On prépare la requête qui compte les lignes
+    String sql = "SELECT COUNT(*) FROM equipe WHERE idmatch = ?";
+    
+    // On utilise votre gestionnaire de connexion par défaut
+    try (Connection con = ConnectionPool.getConnection();
+        PreparedStatement pst = con.prepareStatement(sql)) {        
+        pst.setInt(1, idMatch);
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                // Retourne le nombre trouvé (ex: 0, 1 ou 2)
+                return rs.getInt(1);
+            }
+        }
+    }
+    return 0; // Par défaut, s'il n'y a rien
 }
     
     public static void main(String[] args) {

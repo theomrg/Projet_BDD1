@@ -23,8 +23,11 @@ import fr.insa.beuvron.utils.database.ClasseMiroir;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -74,6 +77,27 @@ public static void créerMatch(Ronde r) {
                 }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
+}
+
+public static List<Match> getAllMatchs() throws SQLException {
+    List<Match> listeMatchs = new ArrayList<>();
+    
+    // 1. Connexion et Requête
+    try (Connection con = ConnectionPool.getConnection(); // ou votre Pool
+         Statement st = con.createStatement();
+         // On sélectionne toutes les colonnes nécessaires
+         ResultSet rs = st.executeQuery("SELECT * FROM matchs")) {
+         
+        while (rs.next()) {
+            // 2. Création de l'objet Match à partir de la ligne BDD
+            // Match(int id, int idRonde, String statut)
+            Match m = new Match(rs.getInt("id"), rs.getInt("idronde")    
+            );
+            
+            listeMatchs.add(m);
+        }
+    }
+    return listeMatchs;
 }
     
     public static void main(String[] args) {

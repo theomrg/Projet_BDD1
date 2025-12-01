@@ -28,6 +28,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.utils.database.ConnectionPool;
+import fr.insa.théo.model.Equipe;
 import static fr.insa.théo.webui.Accueil.append;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,24 +50,30 @@ public class GestionTournoi extends VerticalLayout{
     
     private TextField tfnuméro;
     private TextField tfstatut;
+    private TextField tfnum;
+    
     
     public GestionTournoi() {
         
         this.tfnuméro= new TextField("Numéro de la ronde");
         this.tfstatut = new TextField("Statut");
+        this.tfnum = new TextField("Nombre de joueurs");
         BoutonAjout ajoutéquipebtn = new BoutonAjout("Ajouter une équipe");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
+        ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Choisir la ronde");
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
         BoutonOnglet selectionRonde = new BoutonOnglet("Sélection des rondes");
         
-        this.add(créerrondebtn,hlbutton1,ajoutmatchbtn,selecteurRonde,ajoutéquipebtn);
+        this.add(créerrondebtn,hlbutton1,ajoutmatchbtn,selecteurRonde,ajoutéquipebtn,this.tfnum,selecteurMatch);
+        
         try {
         // 2. On remplit le composant avec la liste venant de la BDD
         selecteurRonde.setItems(Ronde.getAllRondes());
         } catch (SQLException ex) {
          ex.printStackTrace(); }
+        
         selecteurRonde.setItemLabelGenerator(ronde -> 
         "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ") " + "id : " + ronde.getId()
         );
@@ -85,7 +92,41 @@ public class GestionTournoi extends VerticalLayout{
                     Notification.show("Veuillez sélectionner une ronde d'abord !");
                     }
         });
+        
+        try {
+        // 2. Remplissage avec les données
+        selecteurMatch.setItems(Match.getAllMatchs());
+        selecteurMatch.setItemLabelGenerator(match -> 
+            "ID du match" + match.getId() + 
+            " (Ronde " + match.getIdronde()
+        );
+        } catch (SQLException e) {
+         e.printStackTrace(); }
+       
+        ajoutéquipebtn.addClickListener(b -> {
+            Match matchselectionne = selecteurMatch.getValue();
+            int num = Integer.parseInt(tfnum.getValue());
+            if (matchselectionne == null) {
+                Notification.show("Veuillez sélectionner un match d'abord !");
+                return;
+                 }
+                 try {       
+                // A. On demande combien il y a déjà d'équipes
+                int nbEquipesActuelles = Equipe.getNbEquipesParMatch(matchselectionne.getId());
+                // B. On vérifie la limite (2 selon le cahier des charges)
+                if (nbEquipesActuelles >= 2) {
+                    // C. Si c'est plein, on affiche une erreur et ON S'ARRÊTE
+                    Notification.show("Impossible : Ce match a déjà 2 équipes !");
+                    return; 
+                }
+                    // On appelle la méthode modifiée en passant tout l'objet
+                    Equipe.créerEquipe(num,matchselectionne); 
+                    System.out.println("Match sélectionnée : " + matchselectionne.getId());
+                } catch (SQLException e) {
+                e.printStackTrace(); }
+        });
+        
+    }
     
 }
-     
-}
+    
