@@ -106,21 +106,6 @@ public class Accueil extends VerticalLayout {
               });
           });
 
-        /*equipeBtn.addClickListener(a -> {
-        contenu.removeAll();
-        contenu.add(ajoutéquipebtn);
-        ajoutéquipebtn.addClickListener(t -> {
-            setattributs.removeAll();
-            setattributs.add(this.tfnum,this.tfidmatch);
-            contenu.add(setattributs);
-            contenu.add(confirmer);
-            confirmer.addClickListener(x -> {
-                int num = Integer.parseInt(tfnum.getValue());
-                int idmatch = Integer.parseInt(tfidmatch.getValue());
-              
-            });
-         });
-        }); */
 
         
         // Barre de navigation horizontale

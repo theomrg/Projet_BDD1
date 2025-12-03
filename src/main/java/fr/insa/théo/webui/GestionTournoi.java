@@ -17,25 +17,23 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import fr.insa.beuvron.utils.database.ConnectionPool;
 import fr.insa.théo.model.Equipe;
-import static fr.insa.théo.webui.Accueil.append;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import fr.insa.théo.model.Match;
 import fr.insa.théo.model.Ronde;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.server.VaadinSession;
 import fr.insa.théo.model.Joueur;
 
 
@@ -51,6 +49,9 @@ public class GestionTournoi extends VerticalLayout{
     private TextField tfnuméro;
     private TextField tfstatut;
     private TextField tfnum;
+    private TextField tfsurnom;
+    private TextField tfcatégorie;
+    private TextField tftaille;
     
     
     public GestionTournoi() {
@@ -58,22 +59,48 @@ public class GestionTournoi extends VerticalLayout{
         this.tfnuméro= new TextField("Numéro de la ronde");
         this.tfstatut = new TextField("Statut");
         this.tfnum = new TextField("Nombre de joueurs");
+        this.tfsurnom= new TextField("Surnom");
+        this.tfcatégorie= new TextField("Catégorie");
+        this.tftaille= new TextField("Taille (cm)");
+        
         BoutonAjout ajoutéquipebtn = new BoutonAjout("Ajouter une équipe");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
+        BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur au tournoi");
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Choisir la ronde");
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
-        BoutonOnglet selectionRonde = new BoutonOnglet("Sélection des rondes");
+        HorizontalLayout hlbutton2 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille);
         
-        this.add(créerrondebtn,hlbutton1,ajoutmatchbtn,selecteurRonde,ajoutéquipebtn,this.tfnum,selecteurMatch);
+        // Ajout de tous les composants dans le VerticalLayout
+        this.add(créerrondebtn,hlbutton1,ajoutmatchbtn,selecteurRonde,ajoutéquipebtn,this.tfnum,selecteurMatch,ajoutjoueurbtn,hlbutton2);
+       
+        // Fenêtre pop-up
+        Dialog guide = new Dialog();
+        guide.setHeaderTitle("Bienvenue dans le Gestionnaire de Tournoi !");
+        VerticalLayout contenu = new VerticalLayout();
+        contenu.setSpacing(false);
+        contenu.setPadding(false);
+        contenu.add(new H3("Comment ça marche ?"));
+        contenu.add(new Paragraph("1️. Sélectionnez une Ronde ou créez-en une nouvelle."));
+        contenu.add(new Paragraph("2. Créez un Match dans cette ronde."));
+        contenu.add(new Paragraph("3. Sélectionnez ce match pour y ajouter des équipes."));
+        contenu.add(new Paragraph("4. Composez les équipes en y ajoutant des joueurs."));
+        guide.add(contenu);
+        Button boutonCompris = new Button("C'est parti !", e -> guide.close());
+        boutonCompris.addClassName("bouton-onglet");
+        boutonCompris.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        guide.getFooter().add(boutonCompris);
+        if (VaadinSession.getCurrent().getAttribute("guideDejaVu") == null) {
+        guide.open();
+        VaadinSession.getCurrent().setAttribute("guideDejaVu", true);
+        }
         
+        //Création des rondes
         try {
-        // 2. On remplit le composant avec la liste venant de la BDD
         selecteurRonde.setItems(Ronde.getAllRondes());
         } catch (SQLException ex) {
          ex.printStackTrace(); }
-        
         selecteurRonde.setItemLabelGenerator(ronde -> 
         "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ") " + "id : " + ronde.getId()
         );
@@ -82,6 +109,7 @@ public class GestionTournoi extends VerticalLayout{
                 String statut =tfstatut.getValue();
                 Ronde.créerRonde(numéro, statut);
         });
+        // Création des matchs
         ajoutmatchbtn.addClickListener(a -> {
             Ronde rondeSelectionnee = selecteurRonde.getValue();
                 if (rondeSelectionnee != null) {
@@ -93,16 +121,15 @@ public class GestionTournoi extends VerticalLayout{
                     }
         });
         
+        // Création des équipes
         try {
-        // 2. Remplissage avec les données
         selecteurMatch.setItems(Match.getAllMatchs());
         selecteurMatch.setItemLabelGenerator(match -> 
-            "ID du match" + match.getId() + 
-            " (Ronde " + match.getIdronde()
+            "ID du match : " + match.getId() + 
+            " (Ronde " + match.getIdronde()+")"
         );
         } catch (SQLException e) {
          e.printStackTrace(); }
-       
         ajoutéquipebtn.addClickListener(b -> {
             Match matchselectionne = selecteurMatch.getValue();
             int num = Integer.parseInt(tfnum.getValue());
@@ -125,6 +152,14 @@ public class GestionTournoi extends VerticalLayout{
                 } catch (SQLException e) {
                 e.printStackTrace(); }
         });
+       // Création des joueurs
+       ajoutjoueurbtn.addClickListener(g -> {
+           int taille = Integer.parseInt(tftaille.getValue());
+           String surnom =tfsurnom.getValue();
+           String catégorie =tfcatégorie.getValue();
+           Joueur.créerJoueur(surnom, catégorie, taille);  
+       });
+      
         
     }
     
