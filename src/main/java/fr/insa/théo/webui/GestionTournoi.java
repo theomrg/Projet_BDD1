@@ -34,8 +34,10 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.server.VaadinSession;
 import fr.insa.théo.model.Joueur;
+import java.util.List;
 
 
 /**
@@ -70,29 +72,39 @@ public class GestionTournoi extends VerticalLayout{
         BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
         BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur au tournoi");
+        BoutonAjout boutonCompoEquipe = new BoutonAjout("Ajouter le joueur sélectionné à l'équipe");
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Sélectionner la ronde");
         ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
         ComboBox<Joueur> selecteurJoueur = new ComboBox<>("Sélectionner le joueur");
+        HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
+        HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
+        HorizontalLayout hlbutton3 = new HorizontalLayout(tfnum,selecteurMatch);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille,selecteurEquipe,selecteurJoueur);
+        Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
         
-        selecteurEquipe.setWidth("500px");
-        
-        HorizontalLayout hlbutton1 = new HorizontalLayout(créerrondebtn,tfnuméro,tfstatut);
-        HorizontalLayout hlbutton2 = new HorizontalLayout(ajoutmatchbtn,selecteurRonde);
-        HorizontalLayout hlbutton3 = new HorizontalLayout(ajoutéquipebtn,tfnum,selecteurMatch);
-        HorizontalLayout hlbutton4 = new HorizontalLayout(ajoutjoueurbtn,tfsurnom,tfcatégorie,tftaille,selecteurEquipe,selecteurJoueur);
+        grilleJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom");
+        grilleJoueurs.addColumn(Joueur::getCategorie).setHeader("Catégorie");
+        grilleJoueurs.addColumn(Joueur::getTaille).setHeader("Taille");
+        grilleJoueurs.setHeight("200px");
+        grilleJoueurs.setWidth("500px");
         hlbutton1.setSpacing(true);
-        hlbutton1.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        hlbutton1.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         hlbutton2.setSpacing(true);
-        hlbutton2.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        hlbutton2.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         hlbutton3.setSpacing(true);
-        hlbutton3.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        hlbutton3.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         hlbutton4.setSpacing(true);
-        hlbutton4.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-        
+        hlbutton4.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        hlbutton1.setWidthFull();
+        hlbutton2.setWidthFull();
+        hlbutton3.setWidthFull();
+        hlbutton4.setWidthFull();
+        selecteurEquipe.setWidth("200px");
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
-        this.add(hlbutton1,hlbutton2,hlbutton3,hlbutton4);
+        this.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,ajoutéquipebtn,hlbutton4,ajoutjoueurbtn,boutonCompoEquipe,grilleJoueurs);
         this.setPadding(true);
+        this.setAlignItems(Alignment.CENTER);
         
         // Fenêtre pop-up
         Dialog guide = new Dialog();
@@ -101,10 +113,10 @@ public class GestionTournoi extends VerticalLayout{
         contenu.setSpacing(false);
         contenu.setPadding(false);
         contenu.add(new H3("Comment ça marche ?"));
-        contenu.add(new Paragraph("1️. Sélectionnez une Ronde ou créez-en une nouvelle."));
-        contenu.add(new Paragraph("2. Créez un Match dans cette ronde."));
-        contenu.add(new Paragraph("3. Sélectionnez ce match pour y ajouter des équipes."));
-        contenu.add(new Paragraph("4. Composez les équipes en y ajoutant des joueurs."));
+        contenu.add(new Paragraph("1️. Sélectionnez une ronde ou créez-en une nouvelle."));
+        contenu.add(new Paragraph("2. Ajoutez un match à la ronde en sélectionnant une des rondes dans le menu déroulant."));
+        contenu.add(new Paragraph("3. Sélectionnez un match dans le menu déroulant pour créer les équipes."));
+        contenu.add(new Paragraph("4. Ajoutez dans un premier temps les joueurs au tournoi, puis sélectionnez dans les menus déroulants un joueur et un équipe pour faire la composition."));
         guide.add(contenu);
         Button boutonCompris = new Button("C'est parti !", e -> guide.close());
         boutonCompris.addClassName("bouton-onglet");
@@ -198,7 +210,53 @@ public class GestionTournoi extends VerticalLayout{
         ); } catch (SQLException ex) {
          ex.printStackTrace(); }
       
-        
+       selecteurEquipe.addValueChangeListener(event -> {
+       Equipe eq = event.getValue();
+       if (eq != null) {
+            try {
+                // On récupère les joueurs DE CETTE ÉQUIPE (méthode vue précédemment)
+                List<Joueur> listeJoueursE = Equipe.getJoueursDeLEquipe(eq.getId());
+                grilleJoueurs.setItems(listeJoueursE);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            grilleJoueurs.setItems(); // On vide si rien n'est sélectionné
+        }
+    });
+    
+        boutonCompoEquipe.addClickListener(click -> {
+        Equipe eq = selecteurEquipe.getValue();
+        Joueur j = selecteurJoueur.getValue();
+
+        // Vérification que les deux sont bien sélectionnés
+        if (eq != null && j != null) {
+            try {
+                // A. On appelle le modèle pour faire l'INSERT SQL
+                Equipe.ajouterJoueurDansEquipe(eq.getId(), j.getId());
+
+                Notification.show(j.getSurnom() + " ajouté à l'équipe " + eq.getId() + " !");
+
+                // B. Mise à jour immédiate de l'affichage (Grille)
+                // On recharge la liste des membres pour voir le nouveau venu
+                List<Joueur> membresAJour = Equipe.getJoueursDeLEquipe(eq.getId());
+                grilleJoueurs.setItems(membresAJour);
+
+                // C. Optionnel : On vide le sélecteur de joueur pour enchainer
+                selecteurJoueur.clear();
+
+            } catch (SQLException ex) {
+                // Gestion des erreurs (ex: Joueur déjà dans l'équipe - Doublon clé primaire)
+                if (ex.getMessage().contains("Duplicate")) { // Message d'erreur SQL typique
+                     Notification.show("Ce joueur est déjà dans cette équipe !");
+                } else {
+                     Notification.show("Erreur SQL : " + ex.getMessage());
+                }
+            }
+        } else {
+            Notification.show("Veuillez sélectionner une équipe ET un joueur.");
+        }
+    });
     }
     
 }

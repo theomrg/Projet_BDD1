@@ -131,6 +131,54 @@ public static List<Equipe> getAllTeams() throws SQLException {
     }
     return listeEquipes;
 }
+public static List<Joueur> getJoueursDeLEquipe(int idequipe) throws SQLException {
+    List<Joueur> listeJoueursE = new ArrayList<>();
+
+    // LA REQUÊTE SQL (C'est ici que la magie opère !)
+    // On sélectionne les infos du JOUEUR (j.*)
+    // En faisant une JOINTURE avec la table COMPOSITION (c)
+    // Condition : on ne veut que les lignes où l'équipe correspond à 'idEquipe'
+    String sql = "SELECT j.* " +
+                 "FROM joueur j " +
+                 "JOIN composition c ON j.id = c.idjoueur " +
+                 "WHERE c.idequipe = ?";
+
+    try (Connection con = ConnectionSimpleSGBD.defaultCon();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+
+        // On remplit le paramètre (?) avec l'ID de l'équipe reçue en argument
+        pst.setInt(1, idequipe);
+
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                // On reconstruit l'objet Joueur à partir des données de la BDD
+                // ATTENTION : Adaptez ce constructeur selon votre classe Joueur !
+                // Exemple : Joueur(int id, String nom, String prenom, String surnom...)
+                Joueur j = new Joueur(
+                    rs.getInt("id"),
+                    rs.getString("surnom"),
+                    rs.getString("categorie"),
+                    rs.getInt("taillecm")     
+                );
+                
+                listeJoueursE.add(j);
+            }
+        }
+    }
+    return listeJoueursE;
+}
+public static void ajouterJoueurDansEquipe(int idequipe, int idjoueur) throws SQLException {
+    // La requête SQL insère les deux IDs dans la table de jointure
+    String sql = "INSERT INTO composition (idequipe, idjoueur) VALUES (?, ?)";
+    
+    try (Connection con = ConnectionSimpleSGBD.defaultCon();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, idequipe);
+        pst.setInt(2, idjoueur);
+        pst.executeUpdate();
+    }
+}
     
     public static void main(String[] args) {
          
