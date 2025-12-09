@@ -25,6 +25,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 /**
  *
  * @author theom
@@ -46,6 +48,10 @@ public class Equipe extends ClasseMiroir {
         this.num = num;
         this.score = score;
         this.idmatch= idmatch; 
+    }
+
+    public int getIdmatch() {
+        return idmatch;
     }
     
 
@@ -85,7 +91,7 @@ public class Equipe extends ClasseMiroir {
 public static void créerEquipe(int a, Match m) {
     try (Connection con = ConnectionPool.getConnection()) {
                 Equipe e = new Equipe(a,0,m.getId());
-                e.saveInDB(ConnectionSimpleSGBD.defaultCon());
+                e.saveInDB(ConnectionPool.getConnection());
                 Notification.show("Equipe créée ! Appartient au match " + m.getId());
                }
             catch (SQLException ex) {
@@ -108,6 +114,22 @@ public static int getNbEquipesParMatch(int idMatch) throws SQLException {
         }
     }
     return 0; // Par défaut, s'il n'y a rien
+}
+public static List<Equipe> getAllTeams() throws SQLException {
+    List<Equipe> listeEquipes = new ArrayList<>();
+    
+    // 1. Connexion et Requête
+    try (Connection con = ConnectionPool.getConnection(); 
+         Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery("SELECT * FROM equipe")) { 
+         while (rs.next()) {
+            Equipe e = new Equipe(rs.getInt("id"), rs.getInt("num"),rs.getInt("score"),rs.getInt("idmatch")  
+            );
+            
+            listeEquipes.add(e);
+        }
+    }
+    return listeEquipes;
 }
     
     public static void main(String[] args) {

@@ -92,7 +92,7 @@ private int taillecm;
 public static void créerJoueur(String a,String b,int c) {
      try (Connection con = ConnectionPool.getConnection()) {
                 Joueur j = new Joueur(a,b,c);
-                j.saveInDB(ConnectionSimpleSGBD.defaultCon());
+                j.saveInDB(ConnectionPool.getConnection());
                 Notification.show("Le joueur " + a + " a été ajouté au tournoi");
      }
             catch (SQLException ex) {

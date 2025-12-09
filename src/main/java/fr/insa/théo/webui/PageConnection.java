@@ -20,6 +20,7 @@ package fr.insa.théo.webui;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -43,13 +44,10 @@ public class PageConnection extends VerticalLayout {
      private TextField idtf;
      private TextField mdptf;
      private TextArea messageta;
-     private TextArea accueilta;
      private BoutonOnglet connectionbtn;
 
     public PageConnection() {
-        this.accueilta = new TextArea("Bienvue sur l'interface de gestion de tournoi");
-        this.accueilta.setWidth("50%");
-        this.accueilta.setHeight("10em");
+       
         this.messageta = new TextArea();
         this.idtf = new TextField("Identifiant");
         this.mdptf = new TextField("Mot de passe");
@@ -74,7 +72,8 @@ public class PageConnection extends VerticalLayout {
                 Notification.show("problème : " + ex.getMessage());
             }    
             });    
-        this.add(accueilta,idtf,mdptf,connectionbtn,messageta);
+            this.add(idtf,mdptf,connectionbtn,messageta);
+            
         
         
        

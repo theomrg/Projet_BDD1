@@ -70,51 +70,24 @@ public class Accueil extends VerticalLayout {
         this.tfstatut = new TextField("Statut");
         this.confirmer = new BoutonOnglet("Confirmer");
         
-        ComboBox<Ronde> selecteurRonde = new ComboBox<>("Choisir la ronde");
-        HorizontalLayout setattributs = new HorizontalLayout();
-        BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur");
-        BoutonAjout ajoutéquipebtn = new BoutonAjout("Ajouter une équipe");
-        BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
-        BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
-        BoutonOnglet joueurBtn = new BoutonOnglet("Joueurs");
+        
+        BoutonOnglet statBtn = new BoutonOnglet("Statistiques");
         BoutonOnglet gestionTournoiBtn = new BoutonOnglet("Gérer le tournoi");
-        this.contenu = new Div(); 
-        contenu.addClassName("contenu");
-        contenu.setWidthFull();
-        contenu.setHeight("250px");
-        
-        
         gestionTournoiBtn.addClickListener(v -> {
             UI.getCurrent().getPage().setLocation("http://localhost:8080/GestionTournoi");
         
         });
        
-        joueurBtn.addClickListener(e -> {
-        contenu.removeAll();
-        contenu.add(ajoutjoueurbtn);
-        ajoutjoueurbtn.addClickListener(t -> {
-            setattributs.removeAll();
-            setattributs.add(this.tfcategorie,this.tfsurnom,this.tftaillecm);
-            contenu.add(setattributs);
-            contenu.add(confirmer);
-            confirmer.addClickListener(a -> {
-                String surnom = tfsurnom.getValue();
-                String catégorie =tfcategorie.getValue();
-                int taillecm = Integer.parseInt(tftaillecm.getValue());
-                Joueur.créerJoueur(surnom, catégorie, taillecm);
-                  });
-              });
-          });
+        statBtn.addClickListener(e -> {
+  
+        });
 
-
-        
-        // Barre de navigation horizontale
-        HorizontalLayout barreOnglets = new HorizontalLayout(joueurBtn,gestionTournoiBtn);
+        HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn);
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
         barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        this.add(barreOnglets,contenu); 
-        // Ajout à la vue principale
+        this.add(barreOnglets); 
+       
        
     }
     public static void append(TextArea ou, String quoi) {

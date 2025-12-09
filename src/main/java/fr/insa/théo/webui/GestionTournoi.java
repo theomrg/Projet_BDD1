@@ -33,6 +33,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.server.VaadinSession;
 import fr.insa.théo.model.Joueur;
 
@@ -56,6 +57,8 @@ public class GestionTournoi extends VerticalLayout{
     
     public GestionTournoi() {
         
+        //définition de tous les objets
+        
         this.tfnuméro= new TextField("Numéro de la ronde");
         this.tfstatut = new TextField("Statut");
         this.tfnum = new TextField("Nombre de joueurs");
@@ -68,13 +71,27 @@ public class GestionTournoi extends VerticalLayout{
         BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
         BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur au tournoi");
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
-        ComboBox<Ronde> selecteurRonde = new ComboBox<>("Choisir la ronde");
-        HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
-        HorizontalLayout hlbutton2 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille);
+        ComboBox<Ronde> selecteurRonde = new ComboBox<>("Sélectionner la ronde");
+        ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
+        selecteurEquipe.setWidth("500px");
         
-        // Ajout de tous les composants dans le VerticalLayout
-        this.add(créerrondebtn,hlbutton1,ajoutmatchbtn,selecteurRonde,ajoutéquipebtn,this.tfnum,selecteurMatch,ajoutjoueurbtn,hlbutton2);
-       
+        HorizontalLayout hlbutton1 = new HorizontalLayout(créerrondebtn,tfnuméro,tfstatut);
+        HorizontalLayout hlbutton2 = new HorizontalLayout(ajoutmatchbtn,selecteurRonde);
+        HorizontalLayout hlbutton3 = new HorizontalLayout(ajoutéquipebtn,tfnum,selecteurMatch);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(ajoutjoueurbtn,tfsurnom,tfcatégorie,tftaille,selecteurEquipe);
+        hlbutton1.setSpacing(true);
+        hlbutton1.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        hlbutton2.setSpacing(true);
+        hlbutton2.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        hlbutton3.setSpacing(true);
+        hlbutton3.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        hlbutton4.setSpacing(true);
+        hlbutton4.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        
+        // Ajout de tous les composants dans le VerticalLayout (Vue principale)
+        this.add(hlbutton1,hlbutton2,hlbutton3,hlbutton4);
+        this.setPadding(true);
+        
         // Fenêtre pop-up
         Dialog guide = new Dialog();
         guide.setHeaderTitle("Bienvenue dans le Gestionnaire de Tournoi !");
@@ -153,6 +170,16 @@ public class GestionTournoi extends VerticalLayout{
                 e.printStackTrace(); }
         });
        // Création des joueurs
+       try {
+        selecteurEquipe.setItems(Equipe.getAllTeams());
+        selecteurEquipe.setItemLabelGenerator(equipe -> 
+        "ID : " + equipe.getId() + 
+        " | Nombre de joueurs : " + equipe.getNum() + 
+        " | Score : " + equipe.getScore() + 
+        " | Match : " + equipe.getIdmatch()
+        ); } catch (SQLException ex) {
+         ex.printStackTrace(); }
+    
        ajoutjoueurbtn.addClickListener(g -> {
            int taille = Integer.parseInt(tftaille.getValue());
            String surnom =tfsurnom.getValue();
