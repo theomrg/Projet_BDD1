@@ -73,12 +73,14 @@ public class GestionTournoi extends VerticalLayout{
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Sélectionner la ronde");
         ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
+        ComboBox<Joueur> selecteurJoueur = new ComboBox<>("Sélectionner le joueur");
+        
         selecteurEquipe.setWidth("500px");
         
         HorizontalLayout hlbutton1 = new HorizontalLayout(créerrondebtn,tfnuméro,tfstatut);
         HorizontalLayout hlbutton2 = new HorizontalLayout(ajoutmatchbtn,selecteurRonde);
         HorizontalLayout hlbutton3 = new HorizontalLayout(ajoutéquipebtn,tfnum,selecteurMatch);
-        HorizontalLayout hlbutton4 = new HorizontalLayout(ajoutjoueurbtn,tfsurnom,tfcatégorie,tftaille,selecteurEquipe);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(ajoutjoueurbtn,tfsurnom,tfcatégorie,tftaille,selecteurEquipe,selecteurJoueur);
         hlbutton1.setSpacing(true);
         hlbutton1.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         hlbutton2.setSpacing(true);
@@ -186,6 +188,15 @@ public class GestionTournoi extends VerticalLayout{
            String catégorie =tfcatégorie.getValue();
            Joueur.créerJoueur(surnom, catégorie, taille);  
        });
+       
+       try {
+        selecteurJoueur.setItems(Joueur.getAllPlayers());
+        selecteurJoueur.setItemLabelGenerator(joueur ->  
+        "Surnom : " + joueur.getSurnom()+ 
+        " | Catégorie : " + joueur.getCategorie()+ 
+        " | Taille : " + joueur.getTaille()
+        ); } catch (SQLException ex) {
+         ex.printStackTrace(); }
       
         
     }

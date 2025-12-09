@@ -22,8 +22,11 @@ import fr.insa.beuvron.utils.database.ClasseMiroir;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 /**
  *
  * @author theom
@@ -97,6 +100,23 @@ public static void créerJoueur(String a,String b,int c) {
      }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
+}
+
+public static List<Joueur> getAllPlayers() throws SQLException {
+    List<Joueur> listeJoueurs = new ArrayList<>();
+    
+    // 1. Connexion et Requête
+    try (Connection con = ConnectionPool.getConnection(); 
+         Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery("SELECT * FROM joueur")) { 
+         while (rs.next()) {
+            Joueur j = new Joueur(rs.getInt("id"),rs.getString("surnom"),rs.getString("categorie"),rs.getInt("taillecm")  
+            );
+            
+            listeJoueurs.add(j);
+        }
+    }
+    return listeJoueurs;
 }
     
     public static void main(String[] args) {
