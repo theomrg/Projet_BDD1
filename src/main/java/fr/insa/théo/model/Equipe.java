@@ -143,7 +143,7 @@ public static List<Joueur> getJoueursDeLEquipe(int idequipe) throws SQLException
                  "JOIN composition c ON j.id = c.idjoueur " +
                  "WHERE c.idequipe = ?";
 
-    try (Connection con = ConnectionSimpleSGBD.defaultCon();
+    try (Connection con = ConnectionPool.getConnection();
          PreparedStatement pst = con.prepareStatement(sql)) {
 
         // On remplit le paramètre (?) avec l'ID de l'équipe reçue en argument
@@ -171,13 +171,30 @@ public static void ajouterJoueurDansEquipe(int idequipe, int idjoueur) throws SQ
     // La requête SQL insère les deux IDs dans la table de jointure
     String sql = "INSERT INTO composition (idequipe, idjoueur) VALUES (?, ?)";
     
-    try (Connection con = ConnectionSimpleSGBD.defaultCon();
+    try (Connection con = ConnectionPool.getConnection();
          PreparedStatement pst = con.prepareStatement(sql)) {
          
         pst.setInt(1, idequipe);
         pst.setInt(2, idjoueur);
         pst.executeUpdate();
     }
+}
+public static int getRondeIdDeLEquipe(int idEquipe) throws SQLException {
+    String sql = "SELECT m.idronde FROM equipe e " +
+                 "JOIN matchs m ON e.idmatch = m.id " +
+                 "WHERE e.id = ?";
+                 
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        
+        pst.setInt(1, idEquipe);
+        ResultSet rs = pst.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt("idronde");
+        }
+    }
+    return -1; // Erreur si non trouvé
 }
     
     public static void main(String[] args) {

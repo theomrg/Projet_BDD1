@@ -34,6 +34,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.server.VaadinSession;
 import fr.insa.théo.model.Joueur;
@@ -88,6 +89,8 @@ public class GestionTournoi extends VerticalLayout{
         grilleJoueurs.addColumn(Joueur::getTaille).setHeader("Taille");
         grilleJoueurs.setHeight("200px");
         grilleJoueurs.setWidth("500px");
+        grilleJoueurs.setAllRowsVisible(true);
+        grilleJoueurs.addClassName("glass-grid");
         hlbutton1.setSpacing(true);
         hlbutton1.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         hlbutton2.setSpacing(true);
@@ -104,7 +107,7 @@ public class GestionTournoi extends VerticalLayout{
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
         this.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,ajoutéquipebtn,hlbutton4,ajoutjoueurbtn,boutonCompoEquipe,grilleJoueurs);
         this.setPadding(true);
-        this.setAlignItems(Alignment.CENTER);
+        this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         
         // Fenêtre pop-up
         Dialog guide = new Dialog();
@@ -183,7 +186,6 @@ public class GestionTournoi extends VerticalLayout{
                 } catch (SQLException e) {
                 e.printStackTrace(); }
         });
-       // Création des joueurs
        try {
         selecteurEquipe.setItems(Equipe.getAllTeams());
         selecteurEquipe.setItemLabelGenerator(equipe -> 
@@ -193,7 +195,8 @@ public class GestionTournoi extends VerticalLayout{
         " | Match : " + equipe.getIdmatch()
         ); } catch (SQLException ex) {
          ex.printStackTrace(); }
-    
+       
+     // Création des joueurs
        ajoutjoueurbtn.addClickListener(g -> {
            int taille = Integer.parseInt(tftaille.getValue());
            String surnom =tfsurnom.getValue();
@@ -224,14 +227,27 @@ public class GestionTournoi extends VerticalLayout{
             grilleJoueurs.setItems(); // On vide si rien n'est sélectionné
         }
     });
-    
+    //Composition des équipes
         boutonCompoEquipe.addClickListener(click -> {
         Equipe eq = selecteurEquipe.getValue();
         Joueur j = selecteurJoueur.getValue();
+        
 
         // Vérification que les deux sont bien sélectionnés
         if (eq != null && j != null) {
             try {
+                int idRonde = Equipe.getRondeIdDeLEquipe(eq.getId());
+                int idAutreMatch = Joueur.getMatchActuelDuJoueur(j.getId(), idRonde);
+            
+                // 2. LE GENDARME : On vérifie si le joueur est déjà pris dans cette ronde
+                boolean estPris = Joueur.estDejaInscritDansRonde(j.getId(), idRonde);
+
+                if (estPris) {
+                // 3. Si oui, on bloque et on affiche un message rouge
+                Notification.show("Impossible : " + j.getSurnom()+ " joue déjà dans le match " + idAutreMatch + " de Ronde " + idRonde + " !");
+                
+                return; // ON S'ARRÊTE ICI
+            }
                 // A. On appelle le modèle pour faire l'INSERT SQL
                 Equipe.ajouterJoueurDansEquipe(eq.getId(), j.getId());
 

@@ -118,6 +118,51 @@ public static List<Joueur> getAllPlayers() throws SQLException {
     }
     return listeJoueurs;
 }
+public static boolean estDejaInscritDansRonde(int idjoueur, int idronde) throws SQLException {
+    // La requête fait une triple jointure pour remonter du Joueur jusqu'à la Ronde
+    String sql = "SELECT COUNT(*) FROM composition c " +
+                 "JOIN equipe e ON c.idequipe = e.id " +
+                 "JOIN matchs m ON e.idmatch = m.id " +
+                 "WHERE c.idjoueur = ? AND m.idronde = ?";
+                 
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, idjoueur);
+        pst.setInt(2, idronde);
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                // Si le compte est > 0, c'est qu'il est déjà inscrit !
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+    return false;
+}
+public static int getMatchActuelDuJoueur(int idJoueur, int idRonde) throws SQLException {
+    // La requête est la même, mais on SELECT l'id du match (m.id) au lieu de compter
+    String sql = "SELECT m.id FROM composition c " +
+                 "JOIN equipe e ON c.idequipe = e.id " +
+                 "JOIN matchs m ON e.idmatch = m.id " +
+                 "WHERE c.idjoueur = ? AND m.idronde = ?";
+                 
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, idJoueur);
+        pst.setInt(2, idRonde);
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                // On a trouvé un match ! On renvoie son ID.
+                return rs.getInt("id");
+            }
+        }
+    }
+    // Si on arrive ici, c'est que la requête n'a rien trouvé. Le joueur est libre.
+    return -1;
+}
     
     public static void main(String[] args) {
         
