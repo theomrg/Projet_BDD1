@@ -140,9 +140,10 @@ public static boolean estDejaInscritDansRonde(int idjoueur, int idronde) throws 
     }
     return false;
 }
-public static int getMatchActuelDuJoueur(int idJoueur, int idRonde) throws SQLException {
-    // La requête est la même, mais on SELECT l'id du match (m.id) au lieu de compter
-    String sql = "SELECT m.id FROM composition c " +
+public static int getEquipeActuelleDuJoueur(int idJoueur, int idRonde) throws SQLException {
+    // ON CHANGE LE SELECT : on veut 'e.id' (l'équipe) au lieu de 'm.id' (le match)
+    // On garde les jointures pour faire le lien jusqu'à la ronde
+    String sql = "SELECT e.id FROM composition c " +
                  "JOIN equipe e ON c.idequipe = e.id " +
                  "JOIN matchs m ON e.idmatch = m.id " +
                  "WHERE c.idjoueur = ? AND m.idronde = ?";
@@ -155,13 +156,30 @@ public static int getMatchActuelDuJoueur(int idJoueur, int idRonde) throws SQLEx
         
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
-                // On a trouvé un match ! On renvoie son ID.
+                // On a trouvé ! On retourne l'ID de l'équipe conflictuelle
                 return rs.getInt("id");
             }
         }
     }
-    // Si on arrive ici, c'est que la requête n'a rien trouvé. Le joueur est libre.
-    return -1;
+    return -1; // Rien trouvé, le joueur est libre
+}
+
+public void delete(Connection con) throws SQLException {
+    // 1. On retire le joueur de toutes les compositions
+    String sqlClean = "DELETE FROM composition WHERE idjoueur = ?";
+    try (PreparedStatement pst = con.prepareStatement(sqlClean)) {
+        pst.setInt(1, this.getId());
+        pst.executeUpdate();
+    }
+
+    // 2. On supprime le joueur
+    String sqlDelete = "DELETE FROM joueur WHERE id = ?";
+    try (PreparedStatement pst = con.prepareStatement(sqlDelete)) {
+        pst.setInt(1, this.getId());
+        pst.executeUpdate();
+    }
+    
+    this.entiteSupprimee();
 }
     
     public static void main(String[] args) {
