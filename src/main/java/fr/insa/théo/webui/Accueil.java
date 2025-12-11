@@ -85,6 +85,7 @@ public class Accueil extends VerticalLayout {
         HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn);
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
+        barreOnglets.addClassName("barre-onglets");
         barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         this.add(barreOnglets); 
        

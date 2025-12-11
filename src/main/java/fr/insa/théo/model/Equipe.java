@@ -196,6 +196,26 @@ public static int getRondeIdDeLEquipe(int idEquipe) throws SQLException {
     }
     return -1; // Erreur si non trouvé
 }
+
+public void delete(Connection con) throws SQLException {
+    // 1. D'abord, on supprime les liens dans la table 'composition'
+    String sqlCleanComposition = "DELETE FROM composition WHERE idequipe = ?";
+    try (PreparedStatement pst = con.prepareStatement(sqlCleanComposition)) {
+        pst.setInt(1, this.getId());
+        pst.executeUpdate();
+    }
+
+    // 2. Ensuite, on peut supprimer l'équipe elle-même
+    // Note : On utilise 'id' car votre classe hérite probablement de ClasseMiroir
+    String sqlDeleteEquipe = "DELETE FROM equipe WHERE id = ?";
+    try (PreparedStatement pst = con.prepareStatement(sqlDeleteEquipe)) {
+        pst.setInt(1, this.getId());
+        pst.executeUpdate();
+    }
+    
+    // On signale à l'objet qu'il est supprimé (méthode de ClasseMiroir)
+    this.entiteSupprimee(); 
+}
     
     public static void main(String[] args) {
          

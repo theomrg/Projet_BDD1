@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
@@ -83,6 +84,13 @@ public class GestionTournoi extends VerticalLayout{
         HorizontalLayout hlbutton3 = new HorizontalLayout(tfnum,selecteurMatch);
         HorizontalLayout hlbutton4 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille,selecteurEquipe,selecteurJoueur);
         Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
+        BoutonOnglet statBtn = new BoutonOnglet("Statistiques");
+        BoutonOnglet gestionTournoiBtn = new BoutonOnglet("Gérer le tournoi");
+        HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn);
+        barreOnglets.setWidthFull();
+        barreOnglets.setSpacing(true);
+        barreOnglets.addClassName("barre-onglets");
+        barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         
         grilleJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom");
         grilleJoueurs.addColumn(Joueur::getCategorie).setHeader("Catégorie");
@@ -105,9 +113,15 @@ public class GestionTournoi extends VerticalLayout{
         hlbutton4.setWidthFull();
         selecteurEquipe.setWidth("200px");
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
-        this.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,ajoutéquipebtn,hlbutton4,ajoutjoueurbtn,boutonCompoEquipe,grilleJoueurs);
+        this.add(barreOnglets,hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,ajoutéquipebtn,hlbutton4,ajoutjoueurbtn,boutonCompoEquipe,grilleJoueurs);
         this.setPadding(true);
         this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        
+      
+        gestionTournoiBtn.addClickListener(v -> {
+            UI.getCurrent().getPage().setLocation("http://localhost:8080/GestionTournoi");
+        
+        });
         
         // Fenêtre pop-up
         Dialog guide = new Dialog();
@@ -237,14 +251,14 @@ public class GestionTournoi extends VerticalLayout{
         if (eq != null && j != null) {
             try {
                 int idRonde = Equipe.getRondeIdDeLEquipe(eq.getId());
-                int idAutreMatch = Joueur.getMatchActuelDuJoueur(j.getId(), idRonde);
+                int idAutreEquipe = Joueur.getEquipeActuelleDuJoueur(j.getId(), idRonde);
             
                 // 2. LE GENDARME : On vérifie si le joueur est déjà pris dans cette ronde
                 boolean estPris = Joueur.estDejaInscritDansRonde(j.getId(), idRonde);
 
                 if (estPris) {
                 // 3. Si oui, on bloque et on affiche un message rouge
-                Notification.show("Impossible : " + j.getSurnom()+ " joue déjà dans le match " + idAutreMatch + " de Ronde " + idRonde + " !");
+                Notification.show("Impossible : " + j.getSurnom()+ " joue déjà dans l'équipe " + idAutreEquipe + " de Ronde " + idRonde + " !");
                 
                 return; // ON S'ARRÊTE ICI
             }
@@ -273,6 +287,11 @@ public class GestionTournoi extends VerticalLayout{
             Notification.show("Veuillez sélectionner une équipe ET un joueur.");
         }
     });
+    //Bouton supprimer un joueur
+    
+        
+        
+   
     }
     
 }

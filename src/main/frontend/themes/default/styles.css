@@ -81,3 +81,15 @@ body {
     box-shadow: none;
 }
 
+.barre-onglets {
+    background-color: rgba(255, 255, 255, 0.3); /* Fond semi-transparent */
+    padding: 4px;          /* Petit espace autour des boutons */
+    border-radius: 12px;   /* Coins arrondis pour toute la barre */
+    
+    /* Force les éléments à se toucher sans espace par défaut de Vaadin */
+    
+    /* Optionnel : bordure fine */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+
