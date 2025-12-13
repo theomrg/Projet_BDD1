@@ -35,10 +35,14 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.server.VaadinSession;
+import fr.insa.théo.model.ConnectionSimpleSGBD;
 import fr.insa.théo.model.Joueur;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -64,17 +68,28 @@ public class GestionTournoi extends VerticalLayout{
         //définition de tous les objets
         
         this.tfnuméro= new TextField("Numéro de la ronde");
+        this.tfnuméro.addClassName("glass-field");
         this.tfstatut = new TextField("Statut");
+        this.tfstatut.addClassName("glass-field");
         this.tfnum = new TextField("Nombre de joueurs");
+        this.tfnum.addClassName("glass-field");
         this.tfsurnom= new TextField("Surnom");
+        this.tfsurnom.addClassName("glass-field");
         this.tfcatégorie= new TextField("Catégorie");
+        this.tfcatégorie.addClassName("glass-field");
         this.tftaille= new TextField("Taille (cm)");
+        this.tftaille.addClassName("glass-field");
         
-        BoutonAjout ajoutéquipebtn = new BoutonAjout("Ajouter une équipe");
+        VerticalLayout contenuGauche = new VerticalLayout();
+        VerticalLayout contenuDroit = new VerticalLayout();
+        HorizontalLayout mep = new HorizontalLayout(contenuGauche,contenuDroit);
+        Button aide = new Button( new Icon(VaadinIcon.QUESTION_CIRCLE));
+        aide.addClassName("bouton-onglet");
+        BoutonAjout boutonGenererEquipes = new BoutonAjout("🤝 Générer les équipes du Match");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
         BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur au tournoi");
-        BoutonAjout boutonCompoEquipe = new BoutonAjout("Ajouter le joueur sélectionné à l'équipe");
+        BoutonAjout boutonAleatoire = new BoutonAjout("🎲 Remplissage Aléatoire du Match");
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Sélectionner la ronde");
         ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
@@ -82,11 +97,13 @@ public class GestionTournoi extends VerticalLayout{
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
         HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
         HorizontalLayout hlbutton3 = new HorizontalLayout(tfnum,selecteurMatch);
-        HorizontalLayout hlbutton4 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille,selecteurEquipe,selecteurJoueur);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille);
+        HorizontalLayout hlbutton5 = new HorizontalLayout(selecteurEquipe,selecteurJoueur);
+        
         Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
         BoutonOnglet statBtn = new BoutonOnglet("Statistiques");
         BoutonOnglet gestionTournoiBtn = new BoutonOnglet("Gérer le tournoi");
-        HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn);
+        HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn,aide);
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
         barreOnglets.addClassName("barre-onglets");
@@ -95,27 +112,30 @@ public class GestionTournoi extends VerticalLayout{
         grilleJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom");
         grilleJoueurs.addColumn(Joueur::getCategorie).setHeader("Catégorie");
         grilleJoueurs.addColumn(Joueur::getTaille).setHeader("Taille");
-        grilleJoueurs.setHeight("200px");
-        grilleJoueurs.setWidth("500px");
+        grilleJoueurs.setHeight("300px");
+        grilleJoueurs.setWidth("600px");
         grilleJoueurs.setAllRowsVisible(true);
         grilleJoueurs.addClassName("glass-grid");
         hlbutton1.setSpacing(true);
-        hlbutton1.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        hlbutton1.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         hlbutton2.setSpacing(true);
-        hlbutton2.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        hlbutton2.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         hlbutton3.setSpacing(true);
-        hlbutton3.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        hlbutton3.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         hlbutton4.setSpacing(true);
-        hlbutton4.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        hlbutton4.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         hlbutton1.setWidthFull();
         hlbutton2.setWidthFull();
         hlbutton3.setWidthFull();
         hlbutton4.setWidthFull();
         selecteurEquipe.setWidth("200px");
+        contenuGauche.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,boutonGenererEquipes,hlbutton4,ajoutjoueurbtn,hlbutton5,boutonAleatoire);
+        contenuDroit.add(grilleJoueurs);
+       
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
-        this.add(barreOnglets,hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,ajoutéquipebtn,hlbutton4,ajoutjoueurbtn,boutonCompoEquipe,grilleJoueurs);
+        this.add(barreOnglets,mep);
         this.setPadding(true);
-        this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+       
         
       
         gestionTournoiBtn.addClickListener(v -> {
@@ -124,6 +144,7 @@ public class GestionTournoi extends VerticalLayout{
         });
         
         // Fenêtre pop-up
+        aide.addClickListener(k -> {
         Dialog guide = new Dialog();
         guide.setHeaderTitle("Bienvenue dans le Gestionnaire de Tournoi !");
         VerticalLayout contenu = new VerticalLayout();
@@ -138,11 +159,10 @@ public class GestionTournoi extends VerticalLayout{
         Button boutonCompris = new Button("C'est parti !", e -> guide.close());
         boutonCompris.addClassName("bouton-onglet");
         boutonCompris.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        guide.getFooter().add(boutonCompris);
-        if (VaadinSession.getCurrent().getAttribute("guideDejaVu") == null) {
+        guide.getFooter().add(boutonCompris); 
         guide.open();
-        VaadinSession.getCurrent().setAttribute("guideDejaVu", true);
-        }
+        });
+        
         
         //Création des rondes
         try {
@@ -178,37 +198,60 @@ public class GestionTournoi extends VerticalLayout{
         );
         } catch (SQLException e) {
          e.printStackTrace(); }
-        ajoutéquipebtn.addClickListener(b -> {
-            Match matchselectionne = selecteurMatch.getValue();
-            int num = Integer.parseInt(tfnum.getValue());
-            if (matchselectionne == null) {
-                Notification.show("Veuillez sélectionner un match d'abord !");
-                return;
-                 }
-                 try {       
-                // A. On demande combien il y a déjà d'équipes
-                int nbEquipesActuelles = Equipe.getNbEquipesParMatch(matchselectionne.getId());
-                // B. On vérifie la limite (2 selon le cahier des charges)
-                if (nbEquipesActuelles >= 2) {
-                    // C. Si c'est plein, on affiche une erreur et ON S'ARRÊTE
-                    Notification.show("Impossible : Ce match a déjà 2 équipes !");
-                    return; 
-                }
-                    // On appelle la méthode modifiée en passant tout l'objet
-                    Equipe.créerEquipe(num,matchselectionne); 
-                    System.out.println("Match sélectionnée : " + matchselectionne.getId());
-                } catch (SQLException e) {
-                e.printStackTrace(); }
-        });
-       try {
+        
+        try {
         selecteurEquipe.setItems(Equipe.getAllTeams());
         selecteurEquipe.setItemLabelGenerator(equipe -> 
-        "ID : " + equipe.getId() + 
-        " | Nombre de joueurs : " + equipe.getNum() + 
-        " | Score : " + equipe.getScore() + 
-        " | Match : " + equipe.getIdmatch()
-        ); } catch (SQLException ex) {
-         ex.printStackTrace(); }
+            "ID: " + equipe.getId() + 
+            " Score " + equipe.getScore() +" Match: " + equipe.getIdmatch()
+        ); 
+        } catch (SQLException e) {
+         e.printStackTrace(); }
+        
+        
+        boutonGenererEquipes.addClickListener(click -> {
+        Match match = selecteurMatch.getValue();
+
+        // On utilise une valeur par défaut pour le "nombre de joueurs" (ex: 0 ou la valeur du champ texte)
+        // Ici je prends 0 par défaut pour éviter les erreurs de parsing si le champ est vide
+        int nombreJoueursParDefaut = 0; 
+        try {
+            if (!tfnum.getValue().isEmpty()) {
+                nombreJoueursParDefaut = Integer.parseInt(tfnum.getValue());
+            }
+        } catch (NumberFormatException e) { /* Ignorer */ }
+
+        if (match == null) {
+            Notification.show("Veuillez sélectionner un match d'abord !");
+            return;
+        }
+
+        try {
+            // 1. On regarde combien d'équipes existent déjà pour ce match
+            // (J'utilise getEquipesDuMatch que nous avons créé précédemment)
+            List<Equipe> equipesActuelles = Equipe.getEquipesDuMatch(match.getId());
+            int nbEquipes = equipesActuelles.size();
+
+            if (nbEquipes >= 2) {
+                Notification.show("Ce match a déjà ses 2 équipes !");
+                return;
+            }
+
+            // 2. On crée les équipes manquantes (pour arriver à 2)
+            int aCreer = 2 - nbEquipes;
+            for (int i = 0; i < aCreer; i++) {
+                Equipe.créerEquipe(nombreJoueursParDefaut, match);
+            }
+
+            Notification.show(aCreer + " équipe(s) générée(s) automatiquement pour le match " + match.getId());
+
+        
+
+        } catch (SQLException ex) {
+            Notification.show("Erreur lors de la génération : " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    });
        
      // Création des joueurs
        ajoutjoueurbtn.addClickListener(g -> {
@@ -241,54 +284,107 @@ public class GestionTournoi extends VerticalLayout{
             grilleJoueurs.setItems(); // On vide si rien n'est sélectionné
         }
     });
+       
     //Composition des équipes
-        boutonCompoEquipe.addClickListener(click -> {
-        Equipe eq = selecteurEquipe.getValue();
-        Joueur j = selecteurJoueur.getValue();
-        
+        boutonAleatoire.addClickListener(click -> {
+        Match match = selecteurMatch.getValue();
+        final int MAX_PLAYERS = 6; // La nouvelle limite
 
-        // Vérification que les deux sont bien sélectionnés
-        if (eq != null && j != null) {
-            try {
-                int idRonde = Equipe.getRondeIdDeLEquipe(eq.getId());
-                int idAutreEquipe = Joueur.getEquipeActuelleDuJoueur(j.getId(), idRonde);
-            
-                // 2. LE GENDARME : On vérifie si le joueur est déjà pris dans cette ronde
-                boolean estPris = Joueur.estDejaInscritDansRonde(j.getId(), idRonde);
+        if (match == null) {
+            Notification.show("Veuillez sélectionner un match d'abord !");
+            return;
+        }
 
-                if (estPris) {
-                // 3. Si oui, on bloque et on affiche un message rouge
-                Notification.show("Impossible : " + j.getSurnom()+ " joue déjà dans l'équipe " + idAutreEquipe + " de Ronde " + idRonde + " !");
-                
-                return; // ON S'ARRÊTE ICI
-            }
-                // A. On appelle le modèle pour faire l'INSERT SQL
-                Equipe.ajouterJoueurDansEquipe(eq.getId(), j.getId());
+        try {
+            // 1. Récupération des données
+            List<Equipe> equipesDuMatch = Equipe.getEquipesDuMatch(match.getId());
+            List<Joueur> tousLesJoueurs = Joueur.getAllPlayers();
+            int idRonde = match.getIdronde();
 
-                Notification.show(j.getSurnom() + " ajouté à l'équipe " + eq.getId() + " !");
-
-                // B. Mise à jour immédiate de l'affichage (Grille)
-                // On recharge la liste des membres pour voir le nouveau venu
-                List<Joueur> membresAJour = Equipe.getJoueursDeLEquipe(eq.getId());
-                grilleJoueurs.setItems(membresAJour);
-
-                // C. Optionnel : On vide le sélecteur de joueur pour enchainer
-                selecteurJoueur.clear();
-
-            } catch (SQLException ex) {
-                // Gestion des erreurs (ex: Joueur déjà dans l'équipe - Doublon clé primaire)
-                if (ex.getMessage().contains("Duplicate")) { // Message d'erreur SQL typique
-                     Notification.show("Ce joueur est déjà dans cette équipe !");
-                } else {
-                     Notification.show("Erreur SQL : " + ex.getMessage());
+            // 2. Filtrage : On ne garde que les joueurs LIBRES dans cette ronde
+            List<Joueur> joueursDisponibles = new ArrayList<>();
+            for (Joueur j : tousLesJoueurs) {
+                // "Le Gendarme" : On vérifie s'il joue déjà ailleurs dans la même ronde
+                if (!Joueur.estDejaInscritDansRonde(j.getId(), idRonde)) {
+                    joueursDisponibles.add(j);
                 }
             }
-        } else {
-            Notification.show("Veuillez sélectionner une équipe ET un joueur.");
+
+            // 3. MÉLANGE ALÉATOIRE
+            Collections.shuffle(joueursDisponibles);
+
+            // 4. Distribution intelligente
+            int compteurAjouts = 0;
+
+            for (Equipe eq : equipesDuMatch) {
+                // On regarde combien de places sont DÉJÀ prises
+                List<Joueur> membresActuels = Equipe.getJoueursDeLEquipe(eq.getId());
+                int nbJoueursActuels = membresActuels.size();
+
+                // On calcule combien de places il reste avant d'atteindre 6
+                int placesLibres = MAX_PLAYERS - nbJoueursActuels;
+
+                // On remplit les places vides (si des joueurs sont dispos)
+                for (int i = 0; i < placesLibres; i++) {
+                    if (joueursDisponibles.isEmpty()) {
+                        break; // Plus de joueurs sous la main !
+                    }
+
+                    Joueur chanceux = joueursDisponibles.remove(0); // On prend le premier
+                    Equipe.ajouterJoueurDansEquipe(eq.getId(), chanceux.getId());
+                    compteurAjouts++;
+                }
+            }
+
+            // 5. Feedback utilisateur
+            if (compteurAjouts > 0) {
+                Notification.show(compteurAjouts + " joueurs répartis aléatoirement (Max " + MAX_PLAYERS + "/équipe) !");
+
+                // Si une équipe était sélectionnée, on rafraîchit la grille pour voir le résultat
+                if (selecteurEquipe.getValue() != null) {
+                    grilleJoueurs.setItems(Equipe.getJoueursDeLEquipe(selecteurEquipe.getValue().getId()));
+                }
+            } else {
+                Notification.show("Aucun joueur ajouté (Équipes complètes ou plus de joueurs disponibles).");
+            }
+
+        } catch (SQLException ex) {
+            Notification.show("Erreur BDD : " + ex.getMessage());
+            ex.printStackTrace();
         }
     });
-    //Bouton supprimer un joueur
+        
+    //Bouton supprimer un joueur 
+    grilleJoueurs.addComponentColumn(joueur -> {
     
+    Button boutonSupprimer = new Button(new Icon(VaadinIcon.TRASH));
+    boutonSupprimer.addClassName("glass-button");
+    
+    boutonSupprimer.addClickListener(e -> {
+        // --- Création d'une boite de dialogue de confirmation ---
+        Dialog confirmDialog = new Dialog();
+        confirmDialog.setHeaderTitle("Supprimer " + joueur.getSurnom() + " ?");
+        confirmDialog.add("Êtes-vous sûr ? Cette action est irréversible.");
+        
+        Button btnOui = new Button("Oui, supprimer", click -> {
+            try (Connection con = ConnectionSimpleSGBD.defaultCon()) {
+                // APPEL DE LA MÉTHODE DU MODÈLE
+                joueur.delete(con);
+                
+                Notification.show("Joueur supprimé.");
+
+                confirmDialog.close();
+            } catch (SQLException ex) {
+                Notification.show("Erreur : " + ex.getMessage());
+            }
+        });
+        Button btnNon = new Button("Annuler", click -> confirmDialog.close());
+        confirmDialog.getFooter().add(btnNon, btnOui);
+        confirmDialog.open();
+    });
+    
+    return boutonSupprimer;
+    });
         
         
    

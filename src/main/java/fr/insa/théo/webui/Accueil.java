@@ -17,23 +17,17 @@ You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
+
+
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.combobox.ComboBox;
-import fr.insa.théo.model.Joueur;
-
-
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
-import fr.insa.théo.model.Match;
-import fr.insa.théo.model.Ronde;
-import java.sql.SQLException;
 
 /**
  *
@@ -69,25 +63,44 @@ public class Accueil extends VerticalLayout {
         this.tfnuméro= new TextField("Numéro de la ronde");
         this.tfstatut = new TextField("Statut");
         this.confirmer = new BoutonOnglet("Confirmer");
-        
-        
+        TabSheet onglets = new TabSheet();
         BoutonOnglet statBtn = new BoutonOnglet("Statistiques");
         BoutonOnglet gestionTournoiBtn = new BoutonOnglet("Gérer le tournoi");
+
+    // Onglet 1 : Gestion
+    VerticalLayout pageGestion = new VerticalLayout();
+    pageGestion.add(statBtn, gestionTournoiBtn); /* ...tous vos composants... */
+
+    // Onglet 2 : Stats
+    VerticalLayout pageStats = new VerticalLayout();
+    pageStats.add(new H3("Stats..."));
+
+    // Création automatique des onglets et du lien avec le contenu
+    onglets.add("Gérer le tournoi", pageGestion);
+    onglets.add("Statistiques", pageStats);
+
+    // Vous ajoutez juste le TabSheet à votre écran, il gère tout le reste !
+    this.add(onglets);
+        
+        
+        
+       
         gestionTournoiBtn.addClickListener(v -> {
             UI.getCurrent().getPage().setLocation("http://localhost:8080/GestionTournoi");
         
         });
+        
        
         statBtn.addClickListener(e -> {
   
         });
 
-        HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn);
+        /*HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn);
         barreOnglets.setWidthFull();
         barreOnglets.setSpacing(true);
         barreOnglets.addClassName("barre-onglets");
         barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        this.add(barreOnglets); 
+        this.add(barreOnglets); */
        
        
     }

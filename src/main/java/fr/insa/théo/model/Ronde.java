@@ -105,4 +105,26 @@ public class Ronde extends ClasseMiroir {
         }
         return listeRondes;
     }
+    
+    // Dans model/Ronde.java
+
+public void delete(Connection con) throws SQLException {
+    // 1. On récupère les matchs de la ronde
+    // (Supposons que vous ayez une méthode getMatchs() ou on fait la requête ici)
+    List<Match> matchs = Match.getMatchsDeLaRonde(this.getId()); // À implémenter si besoin
+    
+    for (Match m : matchs) {
+        // On appelle la cascade du match
+        m.delete(con);
+    }
+
+    // 2. On supprime la ronde
+    String sql = "DELETE FROM Ronde WHERE id = ?";
+    try (PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setInt(1, this.getId());
+        pst.executeUpdate();
+    }
+    
+    this.entiteSupprimee();
+}
 }

@@ -216,6 +216,32 @@ public void delete(Connection con) throws SQLException {
     // On signale à l'objet qu'il est supprimé (méthode de ClasseMiroir)
     this.entiteSupprimee(); 
 }
+
+public static List<Equipe> getEquipesDuMatch(int idMatch) throws SQLException {
+    List<Equipe> listeEquipes = new ArrayList<>();
+    
+    String sql = "SELECT * FROM equipe WHERE idmatch = ?";
+    
+    try (Connection con = ConnectionSimpleSGBD.defaultCon();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, idMatch);
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                Equipe e = new Equipe(
+                    rs.getInt("id"),
+                    rs.getInt("num"),
+                    rs.getInt("score"),
+                    rs.getInt("idmatch")  
+                );
+               
+                listeEquipes.add(e);
+            }
+        }
+    }
+    return listeEquipes;
+}
     
     public static void main(String[] args) {
          
