@@ -126,6 +126,7 @@ public class HomePage extends VerticalLayout{
         grilleJoueurs.addClassName("glass-grid-v2");    
         
         
+        
         //Barre d'onglets
         mepS.setVisible(false);
         mepS.add(new H2("Statistiques"), new Paragraph("Contenu à venir..."));
