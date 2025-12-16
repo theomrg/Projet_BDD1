@@ -35,6 +35,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -65,6 +66,9 @@ public class HomePage extends VerticalLayout{
     private TextField tfsurnom;
     private TextField tfcatégorie;
     private TextField tftaille;
+    private Grid<Ronde> gridRondes;
+    private Grid<Match> gridMatchs;
+    private Grid<Equipe> gridEquipes;
     
     
     public HomePage() {
@@ -94,8 +98,9 @@ public class HomePage extends VerticalLayout{
         tabs.addThemeVariants(TabsVariant.LUMO_CENTERED);
         tabs.addClassName("full-width-tabs");
         VerticalLayout contenuGauche = new VerticalLayout();
+        VerticalLayout contenuMid = new VerticalLayout();
         VerticalLayout contenuDroit = new VerticalLayout();
-        HorizontalLayout mepGT = new HorizontalLayout(contenuGauche,contenuDroit);
+        HorizontalLayout mepGT = new HorizontalLayout(contenuGauche,contenuMid,contenuDroit);
         HorizontalLayout mepS = new HorizontalLayout();
         
        
@@ -160,7 +165,7 @@ public class HomePage extends VerticalLayout{
         grilleJoueurs.setHeight("300px");
         grilleJoueurs.setWidth("600px");
         grilleJoueurs.setAllRowsVisible(true);
-        grilleJoueurs.addClassName("glass-grid");
+        grilleJoueurs.addClassName("glass-grid-v2");
         hlbutton1.setSpacing(true);
         hlbutton1.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         hlbutton2.setSpacing(true);
@@ -173,9 +178,37 @@ public class HomePage extends VerticalLayout{
         hlbutton2.setWidthFull();
         hlbutton3.setWidthFull();
         hlbutton4.setWidthFull();
+        // --- 1. Grid des RONDES ---
+        gridRondes = new Grid<>(Ronde.class, false);
+        gridRondes.addClassName("glass-grid-v2");
+        gridRondes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
+        gridRondes.addColumn(Ronde::getId).setHeader("ID Ronde").setWidth("80px").setFlexGrow(0);
+        gridRondes.addColumn(Ronde::getNumero).setHeader("Numéro");
+        gridRondes.addColumn(Ronde::getStatut).setHeader("Statut");
+        gridRondes.setAllRowsVisible(true);
+
+        // --- 2. Grid des MATCHS ---
+        gridMatchs = new Grid<>(Match.class, false);
+        gridMatchs.addClassName("glass-grid-v2");
+        gridMatchs.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
+        gridMatchs.addColumn(Match::getId).setHeader("ID Match").setWidth("80px").setFlexGrow(0);
+        gridMatchs.addColumn(Match::getIdronde).setHeader("ID Ronde Parente");
+        gridMatchs.setAllRowsVisible(true);
+
+        // --- 3. Grid des ÉQUIPES ---
+        gridEquipes = new Grid<>(Equipe.class, false);
+        gridEquipes.addClassName("glass-grid-v2");
+        gridEquipes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
+        gridEquipes.addColumn(Equipe::getId).setHeader("ID Équipe").setWidth("80px").setFlexGrow(0);
+        gridEquipes.addColumn(Equipe::getNum).setHeader("Numéro Équipe");
+        gridEquipes.addColumn(Equipe::getScore).setHeader("Score");
+        gridEquipes.addColumn(Equipe::getIdmatch).setHeader("ID Match Parent");
+        gridEquipes.setAllRowsVisible(true);
         selecteurEquipe.setWidth("200px");
+        rafraichirToutesLesDonnees();
         contenuGauche.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,boutonGenererEquipes,hlbutton4,ajoutjoueurbtn,hlbutton5,boutonAleatoire);
-        contenuDroit.add(grilleJoueurs,selecteurEquipe);
+        contenuMid.add(grilleJoueurs,selecteurEquipe,gridEquipes);
+        contenuDroit.add(gridRondes,gridMatchs);
        
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
         this.add(tabs,mepGT);
@@ -297,7 +330,7 @@ public class HomePage extends VerticalLayout{
        Equipe eq = event.getValue();
        if (eq != null) {
             try {
-                // On récupère les joueurs DE CETTE ÉQUIPE (méthode vue précédemment)
+                    
                 List<Joueur> listeJoueursE = Equipe.getJoueursDeLEquipe(eq.getId());
                 grilleJoueurs.setItems(listeJoueursE);
             } catch (SQLException e) {
@@ -408,9 +441,17 @@ public class HomePage extends VerticalLayout{
     
     return boutonSupprimer;
     });
-        
-        
+      
    
+    }
+    private void rafraichirToutesLesDonnees() {
+        try {
+            if(gridRondes != null) gridRondes.setItems(Ronde.getAllRondes());
+            if(gridMatchs != null) gridMatchs.setItems(Match.getAllMatchs());
+            if(gridEquipes != null) gridEquipes.setItems(Equipe.getAllTeams());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
 }
