@@ -1,4 +1,4 @@
-package fr.insa.théo.webui;
+package fr.insa.theo.webui;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
@@ -11,7 +11,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 
     public static void main(String[] args) {
-        // seulement si bdd h2 en memoire
+        // seulement si bdd h2 en memoire 
 //        try (Connection con = ConnectionPool.getConnection()) {
 //            GestionSchema.razBdd(con);
 //            BdDTest.createBdDTestV2(con);

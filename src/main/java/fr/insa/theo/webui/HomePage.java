@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.théo.webui;
+package fr.insa.theo.webui;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -25,10 +25,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import fr.insa.théo.model.Equipe;
+import fr.insa.theo.model.Equipe;
 import java.sql.SQLException;
-import fr.insa.théo.model.Match;
-import fr.insa.théo.model.Ronde;
+import fr.insa.theo.model.Match;
+import fr.insa.theo.model.Ronde;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
@@ -42,8 +42,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
-import fr.insa.théo.model.ConnectionSimpleSGBD;
-import fr.insa.théo.model.Joueur;
+import fr.insa.theo.model.ConnectionSimpleSGBD;
+import fr.insa.theo.model.Joueur;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;

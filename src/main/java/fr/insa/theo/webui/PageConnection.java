@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.théo.webui;
+package fr.insa.theo.webui;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,7 +27,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.utils.database.ConnectionPool;
-import static fr.insa.théo.webui.Accueil.append;
+import static fr.insa.theo.webui.Accueil.append;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

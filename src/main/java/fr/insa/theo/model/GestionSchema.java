@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.théo.model;
+package fr.insa.theo.model;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
