@@ -1,11 +1,15 @@
 /* Add your styles here */
 :root {
-    --glass-background: rgba(255, 255, 255, 0.2); /* Fond blanc transparent */
-    --glass-border-color: rgba(255, 255, 255, 0.5); /* Bordure semi-transparente */
-    --glass-shadow: rgba(0, 0, 0, 0.1); /* Ombre légère */
-    --glass-text-color: black; /* Texte blanc pour contraster avec le fond flou */
-    --mauve-start: #f0e6ff; /* Lavande très clair */
-    --mauve-end: #d0bfff; /* Violet clair */
+    /* --- Couleurs du Fond (Ajustement Final : Magenta/Améthyste) --- */
+    /* Ces couleurs sont plus claires que la version 'Royal Purple' mais conservent la profondeur. */
+    --mauve-start: #D9CFEB; /* Magenta foncé */
+    --mauve-end: #977BC7;   /* Violet vif */
+    
+    /* --- Variables Glassmorphism (Gardées pour le contraste) --- */
+    --glass-background: rgba(255, 255, 255, 0.15); 
+    --glass-border-color: rgba(255, 255, 255, 0.35); /* Un peu plus visible */
+    --glass-shadow: rgba(0, 0, 0, 0.2); 
+    --glass-text-color: #000000; 
 }
 
 body {
@@ -21,7 +25,7 @@ body {
     ); 
 }
 .bouton-onglet {
-    background-color: #8e44ad;
+    background-color: #6847A1;
     color: white;
     font-weight: bold;
     border-radius: 8px;
@@ -30,7 +34,7 @@ body {
 }
 
 .bouton-onglet:hover {
-    background-color: #9b59b6;
+    background-color: #6847A1;
     transform: scale(1.05);
     box-shadow: 0 6px 10px rgba(0,0,0,0.3);
 }
@@ -81,15 +85,6 @@ body {
     box-shadow: none;
 }
 
-.barre-onglets {
-    background-color: rgba(0, 0, 0, 0.05); /* Fond gris très léger */
-    padding: 5px;
-    border-radius: 30px; /* Forme de pilule très arrondie */
-    display: flex;
-    gap: 5px; /* Espace entre les boutons */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-        
-}
 .glass-field {
     /* Largeur par défaut pour être joli */
     width: 100%; 
@@ -133,5 +128,150 @@ body {
 .glass-field::part(input-field) ::placeholder {
     color: rgba(0, 0, 0, 0.4);
 }
+.glass-combobox {
+    width: 100%; 
+    /* Retire la bordure et le fond par défaut de Vaadin pour laisser le CSS prendre le relais */
+    --vaadin-input-field-border-width: 0; 
+    --vaadin-input-field-border-radius: 12px; 
+}
 
+/* 1. Le Label (Le titre du menu déroulant) */
+.glass-combobox::part(label) {
+    color: var(--glass-text-color); /* Texte en blanc sur fond sombre */
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+}
 
+/* 2. La zone de saisie (Le fond du champ) */
+.glass-combobox::part(input-field) {
+    background-color: var(--glass-background); /* Fond transparent */
+    border-radius: 12px;
+    border: 1px solid var(--glass-border-color); /* Bordure fine blanche */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); /* Petite ombre interne */
+    padding-left: 10px;
+    transition: all 0.2s;
+}
+
+/* 3. Le bouton (La flèche déroulante) */
+.glass-combobox::part(toggle-button) {
+    color: var(--glass-text-color); /* Rendre l'icône de la flèche blanche */
+    background: transparent;
+    padding: 0 10px;
+}
+
+/* 4. Quand le champ est actif (Focus) */
+.glass-combobox[focused]::part(input-field) {
+    background-color: rgba(255, 255, 255, 0.8); /* Devient plus blanc/opaque */
+    border-color: #9C27B0;    /* Bordure devient violet vif (mauve-end) */
+    box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.2); /* Halo mauve autour */
+}
+
+/* 5. Le contenu qui s'ouvre (Le menu déroulant) - NON ESSENTIEL MAIS RECOMMANDE */
+/* Ceci cible le menu flottant lui-même pour qu'il soit aussi en verre */
+[theme~="lumo"] .vaadin-combo-box-overlay {
+    background-color: rgba(255, 255, 255, 0.9); 
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+[theme~="lumo"] .vaadin-combo-box-item {
+    color: #333; 
+}
+[theme~="lumo"] .vaadin-combo-box-item[selected] {
+    background-color: rgba(156, 39, 176, 0.1); /* Surlignage léger mauve */
+}
+
+.glass-grid-v2 {
+    /* 1. Conteneur principal */
+     /* Rend la Grid totalement transparente */
+    border: 1px solid var(--glass-border-color); /* Bordure externe fine */
+    border-radius: 16px;
+    box-shadow: 0 8px 15px var(--glass-shadow); /* Ombre pour l'effet flottant */
+    overflow: hidden !important;
+    /* 2. Réglages des couleurs internes de Vaadin pour la transparence */
+    
+    /* Fond des EN-TÊTES (Header) */
+    --vaadin-grid-header-background-color: rgba(255, 255, 255, 0.15); /* Un peu plus opaque que le body */
+    --lumo-secondary-text-color: var(--glass-text-color); /* Texte en blanc */
+    
+    
+    /* Fond des lignes impaires (si 'row-stripes' est activé) */
+    --vaadin-grid-body-row-odd-background-color: rgba(255, 255, 255, 0.15); /* Juste une légère différence */
+    
+    /* Bordures de Cellules */
+    --vaadin-grid-row-border-color: rgba(255, 255, 255, 0.15); /* Bordures très fines et transparentes */
+    
+    /* Couleur du texte principal de la Grid */
+    color: var(--glass-text-color) !important; 
+}
+
+/* 3. Style des en-têtes (pour le texte) */
+.glass-grid-v2::part(header-cell) {
+    color: var(--glass-text-color); 
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+/* 4. Effet de survol (Hover) sur les lignes */
+.glass-grid-v2::part(row):hover {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    cursor: pointer;
+}
+
+/* 5. Le contenu sélectionné (quand on clique sur une ligne) */
+.glass-grid-v2::part(row):focus-ring,
+.glass-grid-v2::part(row)[selected] {
+    background-color: rgba(255, 255, 255, 0.15) !important; /* Un mauve semi-transparent */
+}
+
+.full-width-tabs {
+    background-color: white;       /* Fond blanc opaque */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Ombre légère en dessous */
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    z-index: 10;                   /* S'assure qu'elle est au dessus */
+}
+
+/* Style des onglets individuels */
+.full-width-tabs vaadin-tab {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #777;
+    transition: all 0.3s ease;     /* Transition fluide de la couleur */
+    cursor: pointer;
+    
+}
+
+/* Onglet Sélectionné */
+.full-width-tabs vaadin-tab[selected] {
+    color: #6C5585;                /* Votre Violet */
+    font-weight: bold;
+    background-color: transparent; /* Pas de fond gris par défaut */
+}
+
+/* La ligne colorée sous l'onglet actif (Customisation de Vaadin) */
+.full-width-tabs vaadin-tab::after {
+    background-color: #6C5585 !important; /* Ligne Mauve */
+    height: 3px !important;        /* Un peu plus épaisse */
+    border-radius: 3px 3px 0 0;
+    width: 60% !important;         /* La ligne ne fait pas toute la largeur du mot */
+    left: 20% !important;          /* Centrée */
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); /* Animation de la ligne */
+}
+
+/* --- Animation d'apparition du contenu (Fade In) --- */
+.animate-fade {
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px); /* Vient un peu du bas */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

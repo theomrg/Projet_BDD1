@@ -35,9 +35,13 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.tabs.TabsVariant;
 import fr.insa.théo.model.ConnectionSimpleSGBD;
 import fr.insa.théo.model.Joueur;
 import java.sql.Connection;
@@ -53,7 +57,7 @@ import java.util.List;
 
 @Route(value = "GestionTournoi")
 @PageTitle("GestionTournoi")
-public class GestionTournoi extends VerticalLayout{
+public class HomePage extends VerticalLayout{
     
     private TextField tfnuméro;
     private TextField tfstatut;
@@ -63,7 +67,7 @@ public class GestionTournoi extends VerticalLayout{
     private TextField tftaille;
     
     
-    public GestionTournoi() {
+    public HomePage() {
         
         //définition de tous les objets
         
@@ -80,35 +84,76 @@ public class GestionTournoi extends VerticalLayout{
         this.tftaille= new TextField("Taille (cm)");
         this.tftaille.addClassName("glass-field");
         
+        
+        Tab tabGestion = new Tab("Gérer le Tournoi");
+        Tab tabStats = new Tab("Statistiques");
+        Tab tabCon = new Tab("Connection");
+        Tab tabaide = new Tab(new Icon(VaadinIcon.QUESTION_CIRCLE));
+        Tabs tabs = new Tabs(tabGestion,tabStats,tabCon,tabaide);
+        tabs.setWidthFull();
+        tabs.addThemeVariants(TabsVariant.LUMO_CENTERED);
+        tabs.addClassName("full-width-tabs");
         VerticalLayout contenuGauche = new VerticalLayout();
         VerticalLayout contenuDroit = new VerticalLayout();
-        HorizontalLayout mep = new HorizontalLayout(contenuGauche,contenuDroit);
-        Button aide = new Button( new Icon(VaadinIcon.QUESTION_CIRCLE));
-        aide.addClassName("bouton-onglet");
+        HorizontalLayout mepGT = new HorizontalLayout(contenuGauche,contenuDroit);
+        HorizontalLayout mepS = new HorizontalLayout();
+        
+       
         BoutonAjout boutonGenererEquipes = new BoutonAjout("🤝 Générer les équipes du Match");
-        BoutonAjout ajoutmatchbtn = new BoutonAjout("Ajouter un match");
-        BoutonAjout créerrondebtn = new BoutonAjout("Créer une ronde");
-        BoutonAjout ajoutjoueurbtn = new BoutonAjout("Ajouter un joueur au tournoi");
-        BoutonAjout boutonAleatoire = new BoutonAjout("🎲 Remplissage Aléatoire du Match");
+        BoutonAjout ajoutmatchbtn = new BoutonAjout("🏐 Ajouter un match");
+        BoutonAjout créerrondebtn = new BoutonAjout("📣 Créer une ronde");
+        BoutonAjout ajoutjoueurbtn = new BoutonAjout("🤾‍♂ ️Ajouter un joueur au tournoi");
+        BoutonAjout boutonAleatoire = new BoutonAjout("🎲 Composer aléatoirement les équipes");
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
+        selecteurMatch.addClassName("glass-combobox");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Sélectionner la ronde");
+        selecteurRonde.addClassName("glass-combobox");
         ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
+        selecteurEquipe.addClassName("glass-combobox");
         ComboBox<Joueur> selecteurJoueur = new ComboBox<>("Sélectionner le joueur");
+        selecteurJoueur.addClassName("glass-combobox");
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
         HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
-        HorizontalLayout hlbutton3 = new HorizontalLayout(tfnum,selecteurMatch);
+        HorizontalLayout hlbutton3 = new HorizontalLayout(selecteurMatch);
         HorizontalLayout hlbutton4 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille);
-        HorizontalLayout hlbutton5 = new HorizontalLayout(selecteurEquipe,selecteurJoueur);
-        
+        HorizontalLayout hlbutton5 = new HorizontalLayout(selecteurJoueur);
         Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
-        BoutonOnglet statBtn = new BoutonOnglet("Statistiques");
-        BoutonOnglet gestionTournoiBtn = new BoutonOnglet("Gérer le tournoi");
-        HorizontalLayout barreOnglets = new HorizontalLayout(statBtn,gestionTournoiBtn,aide);
-        barreOnglets.setWidthFull();
-        barreOnglets.setSpacing(true);
-        barreOnglets.addClassName("barre-onglets");
-        barreOnglets.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        grilleJoueurs.addClassName("glass-grid-v2");    
         
+        
+        //Barre d'onglets
+        mepS.setVisible(false);
+        mepS.add(new H2("Statistiques"), new Paragraph("Contenu à venir..."));
+        tabs.addSelectedChangeListener(event -> {
+        Tab selectedTab = event.getSelectedTab();
+        if (selectedTab.equals(tabGestion)) {
+            mepGT.setVisible(true);
+            mepS.setVisible(false);
+        } else if (selectedTab.equals(tabStats)) {
+            mepGT.setVisible(false);
+            mepS.setVisible(true);
+        } else if(selectedTab.equals(tabaide)) {
+             Dialog guide = new Dialog();
+            guide.setHeaderTitle("Bienvenue dans le Gestionnaire de Tournoi !");
+            VerticalLayout contenu = new VerticalLayout();
+            contenu.setSpacing(false);
+            contenu.setPadding(false);
+            contenu.add(new H3("Comment ça marche ?"));
+            contenu.add(new Paragraph("1️. Sélectionnez une ronde ou créez-en une nouvelle."));
+            contenu.add(new Paragraph("2. Ajoutez un match à la ronde en sélectionnant une des rondes dans le menu déroulant."));
+            contenu.add(new Paragraph("3. Sélectionnez un match dans le menu déroulant pour créer les équipes."));
+            contenu.add(new Paragraph("4. Ajoutez dans un premier temps les joueurs au tournoi, puis sélectionnez dans les menus déroulants un joueur et un équipe pour faire la composition."));
+            guide.add(contenu);
+            Button boutonCompris = new Button("C'est parti !", e -> guide.close());
+            boutonCompris.addClassName("bouton-onglet");
+            boutonCompris.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            guide.getFooter().add(boutonCompris); 
+            guide.open();   
+        } else if(selectedTab.equals(tabCon)) {
+            UI.getCurrent().getPage().setLocation("http://localhost:8080");
+        }
+    });
+       
         grilleJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom");
         grilleJoueurs.addColumn(Joueur::getCategorie).setHeader("Catégorie");
         grilleJoueurs.addColumn(Joueur::getTaille).setHeader("Taille");
@@ -130,39 +175,17 @@ public class GestionTournoi extends VerticalLayout{
         hlbutton4.setWidthFull();
         selecteurEquipe.setWidth("200px");
         contenuGauche.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,boutonGenererEquipes,hlbutton4,ajoutjoueurbtn,hlbutton5,boutonAleatoire);
-        contenuDroit.add(grilleJoueurs);
+        contenuDroit.add(grilleJoueurs,selecteurEquipe);
        
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
-        this.add(barreOnglets,mep);
-        this.setPadding(true);
-       
+        this.add(tabs,mepGT);
+        this.setPadding(false);
+        this.setSpacing(false);
+        this.setSizeFull();
+        mepGT.setPadding(true);
+        mepS.setPadding(true);
         
-      
-        gestionTournoiBtn.addClickListener(v -> {
-            UI.getCurrent().getPage().setLocation("http://localhost:8080/GestionTournoi");
-        
-        });
-        
-        // Fenêtre pop-up
-        aide.addClickListener(k -> {
-        Dialog guide = new Dialog();
-        guide.setHeaderTitle("Bienvenue dans le Gestionnaire de Tournoi !");
-        VerticalLayout contenu = new VerticalLayout();
-        contenu.setSpacing(false);
-        contenu.setPadding(false);
-        contenu.add(new H3("Comment ça marche ?"));
-        contenu.add(new Paragraph("1️. Sélectionnez une ronde ou créez-en une nouvelle."));
-        contenu.add(new Paragraph("2. Ajoutez un match à la ronde en sélectionnant une des rondes dans le menu déroulant."));
-        contenu.add(new Paragraph("3. Sélectionnez un match dans le menu déroulant pour créer les équipes."));
-        contenu.add(new Paragraph("4. Ajoutez dans un premier temps les joueurs au tournoi, puis sélectionnez dans les menus déroulants un joueur et un équipe pour faire la composition."));
-        guide.add(contenu);
-        Button boutonCompris = new Button("C'est parti !", e -> guide.close());
-        boutonCompris.addClassName("bouton-onglet");
-        boutonCompris.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        guide.getFooter().add(boutonCompris); 
-        guide.open();
-        });
-        
+     
         
         //Création des rondes
         try {
