@@ -41,9 +41,12 @@ public class GestionSchema {
                 
                 st.executeUpdate("create table joueur ("
                         + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
-                        + " surnom varchar(20) not null unique,"
-                        + " categorie varchar(1), "
-                        + " taillecm int  "     
+                        + " prenom varchar(20) not null,"
+                        + " nom varchar(20) not null,"
+                        + " surnom varchar(20) not null,"  
+                        + " sexe varchar(10) not null,"
+                        + " dateNaissance DATE,"        
+                        + " categorie varchar(1) "    
                         + ") "   );
                 st.executeUpdate("create table ronde ("
                         + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
@@ -54,13 +57,13 @@ public class GestionSchema {
                 st.executeUpdate("create table matchs ("
                         + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
                         + " idronde int not null, "
-                        + " foreign key (idronde) references ronde(id)"
-                                
+                        + " foreign key (idronde) references ronde(id),"
+                        + " statut varchar (10) not null"        
                         + ")" );
                 
                 st.executeUpdate("create table equipe ("
                         + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
-                        + " num int not null,"
+                        + " nomEquipe varchar(20) not null,"
                         + " score int, " 
                         + " idmatch int,  " 
                         + " foreign key (idmatch) references matchs(id)"
@@ -72,8 +75,10 @@ public class GestionSchema {
                         + " foreign key (idequipe) references equipe(id),"
                         + " foreign key (idjoueur) references joueur(id)"
                         + ") "   );
+                
                 st.executeUpdate("create table utilisateurs ("
-                        + " idutilisateur varchar(20),"
+                        + " idutilisateur int,"
+                        + " foreign key (idutilisateur) references joueur(id),"
                         + " mdp varchar(20), "
                         + " profil varchar(20) "
                         + ") "   );

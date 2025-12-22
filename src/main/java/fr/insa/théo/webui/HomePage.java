@@ -34,9 +34,11 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -46,6 +48,7 @@ import com.vaadin.flow.component.tabs.TabsVariant;
 import fr.insa.théo.model.ConnectionSimpleSGBD;
 import fr.insa.théo.model.Joueur;
 import java.sql.Connection;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,10 +65,13 @@ public class HomePage extends VerticalLayout{
     
     private TextField tfnuméro;
     private TextField tfstatut;
-    private TextField tfnum;
     private TextField tfsurnom;
     private TextField tfcatégorie;
-    private TextField tftaille;
+    private TextField tfprénom;
+    private TextField tfnom;
+    private TextField tfsexe;
+    private DatePicker dateN;
+    private TextField tfnomEquipe;
     private Grid<Ronde> gridRondes;
     private Grid<Match> gridMatchs;
     private Grid<Equipe> gridEquipes;
@@ -79,15 +85,21 @@ public class HomePage extends VerticalLayout{
         this.tfnuméro.addClassName("glass-field");
         this.tfstatut = new TextField("Statut");
         this.tfstatut.addClassName("glass-field");
-        this.tfnum = new TextField("Nombre de joueurs");
-        this.tfnum.addClassName("glass-field");
+        this.tfnom = new TextField("Nom");
+        this.tfnom.addClassName("glass-field");
         this.tfsurnom= new TextField("Surnom");
         this.tfsurnom.addClassName("glass-field");
         this.tfcatégorie= new TextField("Catégorie");
         this.tfcatégorie.addClassName("glass-field");
-        this.tftaille= new TextField("Taille (cm)");
-        this.tftaille.addClassName("glass-field");
-        
+        this.tfprénom= new TextField("Prénom");
+        this.tfprénom.addClassName("glass-field");
+        this.tfsexe= new TextField("Sexe");
+        this.tfsexe.addClassName("glass-field");
+        this.dateN= new DatePicker("Date de Naissance");
+        this.dateN.addClassName("glass-field");
+        this.tfnomEquipe= new TextField("Nom de l'équipe");
+        this.tfnomEquipe.addClassName("glass-field");
+       
         
         Tab tabGestion = new Tab("Gérer le Tournoi");
         Tab tabStats = new Tab("Statistiques");
@@ -102,8 +114,12 @@ public class HomePage extends VerticalLayout{
         VerticalLayout contenuDroit = new VerticalLayout();
         HorizontalLayout mepGT = new HorizontalLayout(contenuGauche,contenuMid,contenuDroit);
         HorizontalLayout mepS = new HorizontalLayout();
+        DatePicker.DatePickerI18n i18n = new DatePicker.DatePickerI18n();
+        i18n.setDateFormat("dd/MM/yyyy");
+        dateN.setI18n(i18n);
         
-       
+        Span accueil = new Span("Bienvenue sur l'éditeur de Tournoi !");
+        accueil.addClassName("texte-custom-gras");
         BoutonAjout boutonGenererEquipes = new BoutonAjout("🤝 Générer les équipes du Match");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("🏐 Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("📣 Créer une ronde");
@@ -115,16 +131,16 @@ public class HomePage extends VerticalLayout{
         selecteurRonde.addClassName("glass-combobox");
         ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
         selecteurEquipe.addClassName("glass-combobox");
+        selecteurEquipe.setWidth("200px");
         ComboBox<Joueur> selecteurJoueur = new ComboBox<>("Sélectionner le joueur");
         selecteurJoueur.addClassName("glass-combobox");
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
         HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
-        HorizontalLayout hlbutton3 = new HorizontalLayout(selecteurMatch);
-        HorizontalLayout hlbutton4 = new HorizontalLayout(tfsurnom,tfcatégorie,tftaille);
-        HorizontalLayout hlbutton5 = new HorizontalLayout(selecteurJoueur);
+        HorizontalLayout hlbutton3 = new HorizontalLayout(tfnomEquipe,selecteurMatch);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(tfprénom,tfnom,tfsurnom,tfcatégorie,tfsexe,dateN);
         Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
         grilleJoueurs.addClassName("glass-grid-v2");    
-        
+       
         
         
         //Barre d'onglets
@@ -133,6 +149,7 @@ public class HomePage extends VerticalLayout{
         tabs.addSelectedChangeListener(event -> {
         Tab selectedTab = event.getSelectedTab();
         if (selectedTab.equals(tabGestion)) {
+            rafraichirToutesLesDonnees();
             mepGT.setVisible(true);
             mepS.setVisible(false);
         } else if (selectedTab.equals(tabStats)) {
@@ -162,11 +179,11 @@ public class HomePage extends VerticalLayout{
        
         grilleJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom");
         grilleJoueurs.addColumn(Joueur::getCategorie).setHeader("Catégorie");
-        grilleJoueurs.addColumn(Joueur::getTaille).setHeader("Taille");
         grilleJoueurs.setHeight("300px");
         grilleJoueurs.setWidth("600px");
         grilleJoueurs.setAllRowsVisible(true);
         grilleJoueurs.addClassName("glass-grid-v2");
+        grilleJoueurs.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
         hlbutton1.setSpacing(true);
         hlbutton1.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         hlbutton2.setSpacing(true);
@@ -179,40 +196,47 @@ public class HomePage extends VerticalLayout{
         hlbutton2.setWidthFull();
         hlbutton3.setWidthFull();
         hlbutton4.setWidthFull();
+        
         // --- 1. Grid des RONDES ---
         gridRondes = new Grid<>(Ronde.class, false);
         gridRondes.addClassName("glass-grid-v2");
         gridRondes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
-        gridRondes.addColumn(Ronde::getId).setHeader("ID Ronde").setWidth("80px").setFlexGrow(0);
         gridRondes.addColumn(Ronde::getNumero).setHeader("Numéro");
         gridRondes.addColumn(Ronde::getStatut).setHeader("Statut");
         gridRondes.setAllRowsVisible(true);
+        gridRondes.setHeight("300px");
+        gridRondes.setWidth("600px");
 
         // --- 2. Grid des MATCHS ---
         gridMatchs = new Grid<>(Match.class, false);
         gridMatchs.addClassName("glass-grid-v2");
         gridMatchs.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
-        gridMatchs.addColumn(Match::getId).setHeader("ID Match").setWidth("80px").setFlexGrow(0);
-        gridMatchs.addColumn(Match::getIdronde).setHeader("ID Ronde Parente");
+        gridMatchs.addColumn(Match::getId).setHeader("Match");
+        gridMatchs.addColumn(Match::getStatut).setHeader("Statut");
+        gridMatchs.addColumn(Match::getIdronde).setHeader("Ronde");
         gridMatchs.setAllRowsVisible(true);
+        gridMatchs.setHeight("300px");
+        gridMatchs.setWidth("600px");
 
         // --- 3. Grid des ÉQUIPES ---
         gridEquipes = new Grid<>(Equipe.class, false);
         gridEquipes.addClassName("glass-grid-v2");
         gridEquipes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
-        gridEquipes.addColumn(Equipe::getId).setHeader("ID Équipe").setWidth("80px").setFlexGrow(0);
-        gridEquipes.addColumn(Equipe::getNum).setHeader("Numéro Équipe");
+        gridEquipes.addColumn(Equipe::getNomEquipe).setHeader("Nom");
         gridEquipes.addColumn(Equipe::getScore).setHeader("Score");
-        gridEquipes.addColumn(Equipe::getIdmatch).setHeader("ID Match Parent");
+        gridEquipes.addColumn(Equipe::getIdmatch).setHeader("Match");
         gridEquipes.setAllRowsVisible(true);
-        selecteurEquipe.setWidth("200px");
-        rafraichirToutesLesDonnees();
-        contenuGauche.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,boutonGenererEquipes,hlbutton4,ajoutjoueurbtn,hlbutton5,boutonAleatoire);
+        gridEquipes.setHeight("300px");
+        gridEquipes.setWidth("600px");
+        
+        
+        
+        contenuGauche.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,boutonGenererEquipes,hlbutton4,ajoutjoueurbtn,boutonAleatoire);
         contenuMid.add(grilleJoueurs,selecteurEquipe,gridEquipes);
-        contenuDroit.add(gridRondes,gridMatchs);
+        contenuDroit.add(gridRondes,selecteurJoueur,gridMatchs);
        
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
-        this.add(tabs,mepGT);
+        this.add(tabs,accueil,mepGT);
         this.setPadding(false);
         this.setSpacing(false);
         this.setSizeFull();
@@ -233,6 +257,7 @@ public class HomePage extends VerticalLayout{
                 int numéro = Integer.parseInt(tfnuméro.getValue());
                 String statut =tfstatut.getValue();
                 Ronde.créerRonde(numéro, statut);
+                rafraichirToutesLesDonnees();
         });
         // Création des matchs
         ajoutmatchbtn.addClickListener(a -> {
@@ -240,7 +265,7 @@ public class HomePage extends VerticalLayout{
                 if (rondeSelectionnee != null) {
                     // On appelle la méthode modifiée en passant tout l'objet
                     Match.créerMatch(rondeSelectionnee); 
-                    System.out.println("Ronde sélectionnée : " + rondeSelectionnee.getNumero() + " | ID BDD : " + rondeSelectionnee.getId());
+                    rafraichirToutesLesDonnees();
                 } else {
                     Notification.show("Veuillez sélectionner une ronde d'abord !");
                     }
@@ -250,8 +275,7 @@ public class HomePage extends VerticalLayout{
         try {
         selecteurMatch.setItems(Match.getAllMatchs());
         selecteurMatch.setItemLabelGenerator(match -> 
-            "ID du match : " + match.getId() + 
-            " (Ronde " + match.getIdronde()+")"
+            "Match n° : " + match.getId() 
         );
         } catch (SQLException e) {
          e.printStackTrace(); }
@@ -259,33 +283,23 @@ public class HomePage extends VerticalLayout{
         try {
         selecteurEquipe.setItems(Equipe.getAllTeams());
         selecteurEquipe.setItemLabelGenerator(equipe -> 
-            "ID: " + equipe.getId() + 
-            " Score " + equipe.getScore() +" Match: " + equipe.getIdmatch()
+        equipe.getNomEquipe()    
         ); 
         } catch (SQLException e) {
          e.printStackTrace(); }
         
         
-        boutonGenererEquipes.addClickListener(click -> {
-        Match match = selecteurMatch.getValue();
+                boutonGenererEquipes.addClickListener(click -> {
+                    Match match = selecteurMatch.getValue();
 
-        // On utilise une valeur par défaut pour le "nombre de joueurs" (ex: 0 ou la valeur du champ texte)
-        // Ici je prends 0 par défaut pour éviter les erreurs de parsing si le champ est vide
-        int nombreJoueursParDefaut = 0; 
-        try {
-            if (!tfnum.getValue().isEmpty()) {
-                nombreJoueursParDefaut = Integer.parseInt(tfnum.getValue());
-            }
-        } catch (NumberFormatException e) { /* Ignorer */ }
-
-        if (match == null) {
-            Notification.show("Veuillez sélectionner un match d'abord !");
-            return;
-        }
+                    // Vérification de base
+                    if (match == null) {
+                        Notification.show("Veuillez sélectionner un match d'abord !");
+                        return;
+                    }
 
         try {
             // 1. On regarde combien d'équipes existent déjà pour ce match
-            // (J'utilise getEquipesDuMatch que nous avons créé précédemment)
             List<Equipe> equipesActuelles = Equipe.getEquipesDuMatch(match.getId());
             int nbEquipes = equipesActuelles.size();
 
@@ -294,15 +308,28 @@ public class HomePage extends VerticalLayout{
                 return;
             }
 
-            // 2. On crée les équipes manquantes (pour arriver à 2)
+            // 2. On calcule combien il en manque
             int aCreer = 2 - nbEquipes;
+
+            // 3. Boucle de création
             for (int i = 0; i < aCreer; i++) {
-                Equipe.créerEquipe(nombreJoueursParDefaut, match);
+                // Génération automatique du nom : 
+                // Si 0 équipe existe, on crée "Équipe 1" puis "Équipe 2"
+                // Si 1 équipe existe déjà, on crée "Équipe 2"
+                int numeroEquipe = nbEquipes + i + 1; 
+                String nomAutomatique = "Équipe " + numeroEquipe;
+
+                // Appel de la méthode mise à jour (Nom + Match)
+                // On passe 0 comme score initial par défaut
+                Equipe.créerEquipe(nomAutomatique, match);
             }
 
-            Notification.show(aCreer + " équipe(s) générée(s) automatiquement pour le match " + match.getId());
+            Notification.show(aCreer + " équipe(s) générée(s) pour le match " + match.getId());
 
-        
+            // 4. Mise à jour de l'affichage
+            rafraichirToutesLesDonnees();
+            // Optionnel : mettre à jour le sélecteur si besoin
+            selecteurEquipe.setItems(Equipe.getEquipesDuMatch(match.getId()));
 
         } catch (SQLException ex) {
             Notification.show("Erreur lors de la génération : " + ex.getMessage());
@@ -312,18 +339,25 @@ public class HomePage extends VerticalLayout{
        
      // Création des joueurs
        ajoutjoueurbtn.addClickListener(g -> {
-           int taille = Integer.parseInt(tftaille.getValue());
+           String prenom = tfprénom.getValue();
+           String nom = tfprénom.getValue();
            String surnom =tfsurnom.getValue();
            String catégorie =tfcatégorie.getValue();
-           Joueur.créerJoueur(surnom, catégorie, taille);  
+           String sexe= tfsexe.getValue();
+           LocalDate dateNaissance = dateN.getValue();
+           Joueur.créerJoueur(surnom, catégorie, prenom, nom, sexe, dateNaissance);  
+           rafraichirToutesLesDonnees();
        });
        
        try {
         selecteurJoueur.setItems(Joueur.getAllPlayers());
         selecteurJoueur.setItemLabelGenerator(joueur ->  
-        "Surnom : " + joueur.getSurnom()+ 
-        " | Catégorie : " + joueur.getCategorie()+ 
-        " | Taille : " + joueur.getTaille()
+        "Prénom : " + joueur.getPrénom()+ 
+        " | Nom : " + joueur.getNom()+ 
+        " | Surnom : " + joueur.getSurnom()+
+        " | Sexe : "  + joueur.getSexe() +
+        " | Date de Naissance: " + joueur.getDateNaissance() +
+        " | Catégorie : " + joueur.getCategorie()
         ); } catch (SQLException ex) {
          ex.printStackTrace(); }
       
@@ -345,6 +379,7 @@ public class HomePage extends VerticalLayout{
     //Composition des équipes
         boutonAleatoire.addClickListener(click -> {
         Match match = selecteurMatch.getValue();
+        rafraichirToutesLesDonnees();
         final int MAX_PLAYERS = 6; // La nouvelle limite
 
         if (match == null) {

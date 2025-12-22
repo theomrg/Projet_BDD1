@@ -27,6 +27,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.sql.Date;
 /**
  *
  * @author theom
@@ -35,21 +37,31 @@ import java.util.List;
 public class Joueur extends ClasseMiroir{
 private String surnom;
 private String categorie;
-private int taillecm;
+private String prenom;
+private String nom;
+private String sexe;
+private LocalDate dateNaissance;
 
-    public Joueur(String surnom, String categorie, int taille) {
+
+    public Joueur(String surnom, String categorie, String prenom, String nom, String sexe, LocalDate dateNaissance) {
         this.surnom = surnom;
         this.categorie = categorie;
-        this.taillecm = taille;
+        this.prenom = prenom;
+        this.nom = nom;
+        this.sexe = sexe;
+        this.dateNaissance = dateNaissance;
     }
     
-    public Joueur (int id, String surnom, String categorie, int taille) {
+    public Joueur (int id, String surnom, String categorie, String prenom, String nom, String sexe, LocalDate dateNaissance) {
         super(id);
         this.surnom = surnom;
         this.categorie = categorie;
-        this.taillecm = taille;
-    }
-
+        this.prenom = prenom;
+        this.nom = nom;
+        this.sexe = sexe;
+        this.dateNaissance = dateNaissance;
+    }   
+        
     public String getSurnom() {
         return surnom;
     }
@@ -66,35 +78,68 @@ private int taillecm;
         this.categorie = categorie;
     }
 
-    public int getTaille() {
-        return taillecm;
+    public String getPrénom() {
+        return prenom;
     }
 
-    public void setTaille(int taille) {
-        this.taillecm = taille;
+    public void setPrénom(String prénom) {
+        this.prenom = prenom;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getSexe() {
+        return sexe;
+    }
+
+    public void setSexe(String sexe) {
+        this.sexe = sexe;
+    }
+
+    public LocalDate getDateNaissance() {
+        return dateNaissance;
+    }
+
+    public void setDateNaissance(LocalDate dateNaissance) {
+        this.dateNaissance = dateNaissance;
     }
 
     @Override
     public String toString() {
-        return "Joueur{" + "surnom=" + surnom + ", categorie=" + categorie + ", taille=" + taillecm + " :" + this.getId()+ '}';
+        return "Joueur{" + "surnom=" + surnom + ", categorie=" + categorie + ", prenom=" + prenom + ", nom=" + nom + ", sexe=" + sexe + ", dateNaissance=" + dateNaissance + this.getId() +'}';
     }
-
-
+   
+        
 
     @Override
     protected Statement saveSansId(Connection con) throws SQLException {
-        PreparedStatement pst=con.prepareStatement("insert into joueur (surnom, categorie, taillecm) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pst.setString(1, this.surnom);
-            pst.setString(2, this.categorie);
-            pst.setInt(3, this.taillecm);
-            pst.executeUpdate();
-            return pst;
-        
+        String sql = "INSERT INTO joueur (prenom, nom, surnom, sexe, dateNaissance, categorie) "
+               + "VALUES (?, ?, ?, ?, ?, ?)";
+        PreparedStatement pst = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        pst.setString(1, this.prenom);
+        pst.setString(2, this.nom);
+        pst.setString(3, this.surnom);
+        pst.setString(4, this.sexe);
+        if (this.dateNaissance != null) {
+            pst.setDate(5, java.sql.Date.valueOf(this.dateNaissance));
+        } else {
+            pst.setNull(5, java.sql.Types.DATE);
+        }
+        pst.setString(6, this.categorie);
+        pst.executeUpdate();
+        return pst;
     }
+
     
-public static void créerJoueur(String a,String b,int c) {
+public static void créerJoueur(String a,String b,String c,String d,String e,LocalDate f) {
      try (Connection con = ConnectionPool.getConnection()) {
-                Joueur j = new Joueur(a,b,c);
+                Joueur j = new Joueur(a,b,c,d,e,f);
                 j.saveInDB(ConnectionPool.getConnection());
                 Notification.show("Le joueur " + a + " a été ajouté au tournoi");
      }
@@ -110,9 +155,18 @@ public static List<Joueur> getAllPlayers() throws SQLException {
          Statement st = con.createStatement();
          ResultSet rs = st.executeQuery("SELECT * FROM joueur")) { 
          while (rs.next()) {
-            Joueur j = new Joueur(rs.getInt("id"),rs.getString("surnom"),rs.getString("categorie"),rs.getInt("taillecm")  
-            );
-            
+            int id = rs.getInt("id");
+            String surnom = rs.getString("surnom");
+            String categorie = rs.getString("categorie");
+            String prenom = rs.getString("prenom");
+            String nom = rs.getString("nom");
+            String sexe = rs.getString("sexe");
+            java.sql.Date sqlDate = rs.getDate("dateNaissance");
+            LocalDate dateN = null;
+            if (sqlDate != null) {
+                dateN = sqlDate.toLocalDate();
+            }
+            Joueur j = new Joueur(id, surnom, categorie, prenom, nom, sexe, dateN);
             listeJoueurs.add(j);
         }
     }
@@ -181,12 +235,27 @@ public void delete(Connection con) throws SQLException {
     
     this.entiteSupprimee();
 }
+
+public void update(Connection con) throws SQLException {
+        String sql = "UPDATE joueur SET prenom = ?, nom = ?, surnom = ?, sexe = ?, dateNaissance = ?, categorie = ? WHERE id = ?";
+    
+    try (PreparedStatement pst = con.prepareStatement(sql)) {
+        // 2. Remplissage des paramètres (ordre 1 à 6)
+        pst.setString(1, this.prenom);
+        pst.setString(2, this.nom);
+        pst.setString(3, this.surnom);
+        pst.setString(4, this.sexe);
+        
+        if (this.dateNaissance != null) {
+            pst.setDate(5, java.sql.Date.valueOf(this.dateNaissance));
+        } else {
+            pst.setNull(5, java.sql.Types.DATE);
+        }
+        pst.setString(6, this.categorie);
+        pst.executeUpdate();
+        }
+    }   
     
     public static void main(String[] args) {
-        
-  
-        
-        
-        
     }
 }

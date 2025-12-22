@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -32,20 +33,20 @@ import java.util.List;
  * @author theom
  */
 public class Equipe extends ClasseMiroir {
-    private int num;
+    private String nomEquipe;
     private int score;
     private int idmatch;
             
-    public Equipe(int num, int score, int idmatch) {
-        this.num = num;
+    public Equipe(String nomEquipe, int score, int idmatch) {
+        this.nomEquipe = nomEquipe;
         this.score = score;
         this.idmatch = idmatch;
         
     }
     
-    public Equipe(int id, int num, int score, int idmatch) {
+    public Equipe(int id, String nomEquipe, int score, int idmatch) {
         super(id);
-        this.num = num;
+        this.nomEquipe = nomEquipe;
         this.score = score;
         this.idmatch= idmatch; 
     }
@@ -53,14 +54,13 @@ public class Equipe extends ClasseMiroir {
     public int getIdmatch() {
         return idmatch;
     }
-    
 
-    public int getNum() {
-        return num;
+    public String getNomEquipe() {
+        return nomEquipe;
     }
 
-    public void setNum(int num) {
-        this.num = num;
+    public void setNomEquipe(String nomEquipe) {
+        this.nomEquipe = nomEquipe;
     }
 
     public int getScore() {
@@ -73,22 +73,22 @@ public class Equipe extends ClasseMiroir {
 
     @Override
     public String toString() {
-        return "Equipe{" + "num=" + num + ", score=" + score + ", idmatch=" + idmatch + '}';
+        return "Equipe{" + "num=" + nomEquipe + ", score=" + score + ", idmatch=" + idmatch + '}';
     }
 
   
 
     @Override
     protected Statement saveSansId(Connection con) throws SQLException {
-        PreparedStatement pst=con.prepareStatement("insert into equipe (num, score, idmatch) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, this.num);
+        PreparedStatement pst=con.prepareStatement("insert into equipe (nomEquipe, score, idmatch) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            pst.setString(1, this.nomEquipe);
             pst.setInt(2, this.score);
             pst.setInt(3, this.idmatch);
             pst.executeUpdate();
             return pst;
     }
 
-public static void créerEquipe(int a, Match m) {
+public static void créerEquipe(String a, Match m) {
     try (Connection con = ConnectionPool.getConnection()) {
                 Equipe e = new Equipe(a,0,m.getId());
                 e.saveInDB(ConnectionPool.getConnection());
@@ -123,7 +123,7 @@ public static List<Equipe> getAllTeams() throws SQLException {
          Statement st = con.createStatement();
          ResultSet rs = st.executeQuery("SELECT * FROM equipe")) { 
          while (rs.next()) {
-            Equipe e = new Equipe(rs.getInt("id"), rs.getInt("num"),rs.getInt("score"),rs.getInt("idmatch")  
+            Equipe e = new Equipe(rs.getInt("id"), rs.getString("nomEquipe"),rs.getInt("score"),rs.getInt("idmatch")  
             );
             
             listeEquipes.add(e);
@@ -151,15 +151,18 @@ public static List<Joueur> getJoueursDeLEquipe(int idequipe) throws SQLException
 
         try (ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
-                // On reconstruit l'objet Joueur à partir des données de la BDD
-                // ATTENTION : Adaptez ce constructeur selon votre classe Joueur !
-                // Exemple : Joueur(int id, String nom, String prenom, String surnom...)
-                Joueur j = new Joueur(
-                    rs.getInt("id"),
-                    rs.getString("surnom"),
-                    rs.getString("categorie"),
-                    rs.getInt("taillecm")     
-                );
+                int id = rs.getInt("id");
+                String surnom = rs.getString("surnom");
+                String categorie = rs.getString("categorie");
+                String prenom = rs.getString("prenom");
+                String nom = rs.getString("nom");
+                String sexe = rs.getString("sexe");
+                java.sql.Date sqlDate = rs.getDate("dateNaissance");
+                LocalDate dateN = null;
+                if (sqlDate != null) {
+                    dateN = sqlDate.toLocalDate();
+                }
+                Joueur j = new Joueur(id, surnom, categorie, prenom, nom, sexe, dateN);
                 
                 listeJoueursE.add(j);
             }
@@ -231,7 +234,7 @@ public static List<Equipe> getEquipesDuMatch(int idMatch) throws SQLException {
             while (rs.next()) {
                 Equipe e = new Equipe(
                     rs.getInt("id"),
-                    rs.getInt("num"),
+                    rs.getString("nomEquipe"),
                     rs.getInt("score"),
                     rs.getInt("idmatch")  
                 );

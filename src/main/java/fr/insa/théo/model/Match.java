@@ -35,17 +35,26 @@ import java.util.List;
  */
 public class Match extends ClasseMiroir {
     private int idronde; 
+    private String statut;
 
-    public Match(int idronde) {
+    public Match(int idronde, String statut) {
     this.idronde = idronde;
+    this.statut = statut;
         }
     
-    public Match(int id, int idronde) {
+    public Match(int id, int idronde, String statut) {
         super(id);
         this.idronde = idronde;
-    
-
+        this.statut = statut;
 }
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
 
     public int getIdronde() {
         return idronde;
@@ -62,8 +71,9 @@ public class Match extends ClasseMiroir {
 
     @Override
     protected Statement saveSansId(Connection con) throws SQLException {
-        PreparedStatement pst=con.prepareStatement("insert into matchs (idronde) values (?)", PreparedStatement.RETURN_GENERATED_KEYS);
+        PreparedStatement pst=con.prepareStatement("insert into matchs (idronde,statut) values (?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             pst.setInt(1, this.idronde);
+            pst.setString(2, this.statut);
             pst.executeUpdate();
             return pst;
         
@@ -71,7 +81,7 @@ public class Match extends ClasseMiroir {
     
 public static void créerMatch(Ronde r) {
     try (Connection con = ConnectionPool.getConnection()) {
-                Match m= new Match(r.getId());
+                Match m= new Match(r.getId(),"en cours");
                 m.saveInDB(ConnectionPool.getConnection());
                 Notification.show("Match créé ! Appartient à la ronde " + r.getNumero());
                 }
@@ -91,7 +101,7 @@ public static List<Match> getAllMatchs() throws SQLException {
         while (rs.next()) {
             // 2. Création de l'objet Match à partir de la ligne BDD
             // Match(int id, int idRonde, String statut)
-            Match m = new Match(rs.getInt("id"), rs.getInt("idronde")    
+            Match m = new Match(rs.getInt("id"), rs.getInt("idronde"), rs.getString("statut") 
             );
             
             listeMatchs.add(m);
@@ -115,7 +125,8 @@ public static List<Match> getMatchsDeLaRonde(int idRonde) throws SQLException {
                 // Utilisation du constructeur de lecture (id, ronde_id, statut)
                 Match m = new Match(
                     rs.getInt("id"),
-                    rs.getInt("idronde")
+                    rs.getInt("idronde"),
+                    rs.getString("statut") 
                 );
                 listeMatchs.add(m);
             }
