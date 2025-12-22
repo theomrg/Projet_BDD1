@@ -35,6 +35,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
@@ -138,6 +139,15 @@ public class HomePage extends VerticalLayout{
         HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
         HorizontalLayout hlbutton3 = new HorizontalLayout(tfnomEquipe,selecteurMatch);
         HorizontalLayout hlbutton4 = new HorizontalLayout(tfprénom,tfnom,tfsurnom,tfcatégorie,tfsexe,dateN);
+        Details detailsRonde = new Details("🛠️ Créer les Rondes", hlbutton1,créerrondebtn);
+        detailsRonde.addClassName("glass-details");
+        Details detailsMatch = new Details("🛠️ Créer les Matchs", hlbutton2,ajoutmatchbtn);
+        detailsMatch.addClassName("glass-details");
+        Details detailsEquipe = new Details("🛠️ Créer less Equipes", hlbutton3,boutonGenererEquipes);
+        detailsEquipe.addClassName("glass-details");
+        Details detailsJoueur = new Details("🛠 Ajouter les joueurs️", hlbutton4,ajoutjoueurbtn);
+        detailsJoueur.addClassName("glass-details");
+        Details detailsCompo = new Details("🛠️ Composer les équipes", selecteurMatch,boutonAleatoire);
         Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
         grilleJoueurs.addClassName("glass-grid-v2");    
        
@@ -231,7 +241,7 @@ public class HomePage extends VerticalLayout{
         
         
         
-        contenuGauche.add(hlbutton1,créerrondebtn,hlbutton2,ajoutmatchbtn,hlbutton3,boutonGenererEquipes,hlbutton4,ajoutjoueurbtn,boutonAleatoire);
+        contenuGauche.add(detailsRonde,detailsMatch,detailsEquipe,detailsJoueur,detailsCompo);
         contenuMid.add(grilleJoueurs,selecteurEquipe,gridEquipes);
         contenuDroit.add(gridRondes,selecteurJoueur,gridMatchs);
        

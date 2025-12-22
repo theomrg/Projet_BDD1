@@ -292,3 +292,32 @@ body {
     /* Optionnel : taille un peu plus grande que la normale */
     font-size: 1.4em; 
 }
+
+.glass-details {
+    background: rgba(255, 255, 255, 0.05); /* Fond très léger */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    margin-bottom: 10px; /* Espace entre les tiroirs */
+    overflow: hidden; /* Coupe ce qui dépasse */
+    transition: all 0.3s ease;
+}
+
+/* Le Titre (Résumé) */
+.glass-details::part(summary) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+}
+
+.glass-details::part(summary):hover {
+    background: rgba(255, 255, 255, 0.2); /* S'éclaire au survol */
+}
+
+/* Le Contenu intérieur */
+.glass-details::part(content) {
+    padding: 15px; /* Un peu d'espace autour des formulaires */
+    background: rgba(0, 0, 0, 0.1); /* Légèrement plus sombre pour le contraste */
+}
