@@ -245,6 +245,34 @@ public static List<Equipe> getEquipesDuMatch(int idMatch) throws SQLException {
     }
     return listeEquipes;
 }
+public static List<Equipe> getEquipesDeLaRonde(int idRonde) throws SQLException {
+    List<Equipe> list = new ArrayList<>();
+    
+    // Jointure : On prend les équipes (e) dont le match (m) appartient à la ronde demandée
+    // Assurez-vous que le nom des colonnes (id_match, idronde) correspond bien à votre base !
+    String sql = "SELECT e.* FROM equipe e " +
+                 "JOIN matchs m ON e.idmatch = m.id " +
+                 "WHERE m.idronde = ?";
+                 
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, idRonde);
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            while(rs.next()) {
+                Equipe eq = new Equipe(
+                    rs.getInt("id"),
+                    rs.getString("nomEquipe"),
+                    rs.getInt("score"),
+                    rs.getInt("idmatch")
+                );
+                list.add(eq);
+            }
+        }
+    }
+    return list;
+}
     
     public static void main(String[] args) {
          

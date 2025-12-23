@@ -128,6 +128,8 @@ public class HomePage extends VerticalLayout{
         BoutonAjout boutonAleatoire = new BoutonAjout("🎲 Composer aléatoirement les équipes");
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         selecteurMatch.addClassName("glass-combobox");
+        ComboBox<Match> selecteurMatchAlea = new ComboBox<>("Sélectionner un match");
+        selecteurMatchAlea.addClassName("glass-combobox");
         ComboBox<Ronde> selecteurRonde = new ComboBox<>("Sélectionner la ronde");
         selecteurRonde.addClassName("glass-combobox");
         ComboBox<Equipe> selecteurEquipe = new ComboBox<>("Sélectionner l'équipe");
@@ -138,16 +140,18 @@ public class HomePage extends VerticalLayout{
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
         HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
         HorizontalLayout hlbutton3 = new HorizontalLayout(tfnomEquipe,selecteurMatch);
-        HorizontalLayout hlbutton4 = new HorizontalLayout(tfprénom,tfnom,tfsurnom,tfcatégorie,tfsexe,dateN);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(tfprénom,tfnom,tfsurnom);
+        HorizontalLayout hlbutton5 = new HorizontalLayout(tfcatégorie,tfsexe,dateN);
         Details detailsRonde = new Details("🛠️ Créer les Rondes", hlbutton1,créerrondebtn);
         detailsRonde.addClassName("glass-details");
         Details detailsMatch = new Details("🛠️ Créer les Matchs", hlbutton2,ajoutmatchbtn);
         detailsMatch.addClassName("glass-details");
-        Details detailsEquipe = new Details("🛠️ Créer less Equipes", hlbutton3,boutonGenererEquipes);
+        Details detailsEquipe = new Details("🛠️ Créer les Equipes", hlbutton3,boutonGenererEquipes);
         detailsEquipe.addClassName("glass-details");
-        Details detailsJoueur = new Details("🛠 Ajouter les joueurs️", hlbutton4,ajoutjoueurbtn);
+        Details detailsJoueur = new Details("🛠 Ajouter les joueurs️", hlbutton4,hlbutton5,ajoutjoueurbtn);
         detailsJoueur.addClassName("glass-details");
-        Details detailsCompo = new Details("🛠️ Composer les équipes", selecteurMatch,boutonAleatoire);
+        Details detailsCompo = new Details("🛠️ Composer les équipes",selecteurMatchAlea,boutonAleatoire);
+        detailsCompo.addClassName("glass-details");
         Grid<Joueur> grilleJoueurs = new Grid<>(Joueur.class, false);
         grilleJoueurs.addClassName("glass-grid-v2");    
        
@@ -242,6 +246,7 @@ public class HomePage extends VerticalLayout{
         
         
         contenuGauche.add(detailsRonde,detailsMatch,detailsEquipe,detailsJoueur,detailsCompo);
+        contenuGauche.setWidth("700px");
         contenuMid.add(grilleJoueurs,selecteurEquipe,gridEquipes);
         contenuDroit.add(gridRondes,selecteurJoueur,gridMatchs);
        
@@ -263,6 +268,44 @@ public class HomePage extends VerticalLayout{
         selecteurRonde.setItemLabelGenerator(ronde -> 
         "Ronde n°" + ronde.getNumero() + " (" + ronde.getStatut() + ") " + "id : " + ronde.getId()
         );
+        
+        
+        selecteurRonde.addValueChangeListener(event -> {
+        Ronde rondeSelectionnee = event.getValue();
+        if (rondeSelectionnee != null) {
+            try {
+                int idRonde = rondeSelectionnee.getId();
+                rafraichirToutesLesDonnees();
+                selecteurMatch.clear();
+                selecteurEquipe.clear(); 
+                grilleJoueurs.setItems(new ArrayList<>());
+                List<Match> matchsDeLaRonde = Match.getMatchsDeLaRonde(idRonde);
+                List<Equipe> equipesDeLaRonde = Equipe.getEquipesDeLaRonde(idRonde);
+
+            // 3. On met à jour les sélecteurs
+                selecteurMatch.setItems(matchsDeLaRonde);
+                selecteurEquipe.setItems(equipesDeLaRonde);
+
+                // 3. On filtre la grille des ÉQUIPES pour ne voir que celles de cette ronde
+                if (gridEquipes != null) {
+                    gridEquipes.setItems(Equipe.getEquipesDeLaRonde(idRonde));
+                }
+                if (equipesDeLaRonde.isEmpty()) {
+                Notification.show("Aucune équipe dans cette ronde pour l'instant.");
+              }
+
+            } catch (SQLException e) { 
+                e.printStackTrace(); 
+        }
+        } else {
+            // Si on a tout désélectionné (Ronde = vide), on vide les listes déroulantes
+            selecteurMatch.setItems(new ArrayList<>());
+            selecteurEquipe.setItems(new ArrayList<>());
+            rafraichirToutesLesDonnees();
+        }
+      });
+
+          
         créerrondebtn.addClickListener(t -> {
                 int numéro = Integer.parseInt(tfnuméro.getValue());
                 String statut =tfstatut.getValue();
@@ -287,6 +330,10 @@ public class HomePage extends VerticalLayout{
         selecteurMatch.setItemLabelGenerator(match -> 
             "Match n° : " + match.getId() 
         );
+        selecteurMatchAlea.setItems(Match.getAllMatchs());
+        selecteurMatchAlea.setItemLabelGenerator(match -> 
+            "Match n° : " + match.getId() 
+        );
         } catch (SQLException e) {
          e.printStackTrace(); }
         
@@ -299,14 +346,14 @@ public class HomePage extends VerticalLayout{
          e.printStackTrace(); }
         
         
-                boutonGenererEquipes.addClickListener(click -> {
-                    Match match = selecteurMatch.getValue();
+        boutonGenererEquipes.addClickListener(click -> {
+            Match match = selecteurMatch.getValue();
 
-                    // Vérification de base
-                    if (match == null) {
-                        Notification.show("Veuillez sélectionner un match d'abord !");
-                        return;
-                    }
+            // Vérification de base
+            if (match == null) {
+                Notification.show("Veuillez sélectionner un match d'abord !");
+                return;
+            }
 
         try {
             // 1. On regarde combien d'équipes existent déjà pour ce match
@@ -455,7 +502,7 @@ public class HomePage extends VerticalLayout{
             ex.printStackTrace();
         }
     });
-        
+    
     //Bouton supprimer un joueur 
     grilleJoueurs.addComponentColumn(joueur -> {
     

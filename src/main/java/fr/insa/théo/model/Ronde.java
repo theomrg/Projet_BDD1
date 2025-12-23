@@ -84,7 +84,7 @@ public class Ronde extends ClasseMiroir {
          try (Connection con = ConnectionPool.getConnection()) {
                 Ronde r = new Ronde(a,b);
                 r.saveInDB(ConnectionSimpleSGBD.defaultCon());
-                Notification.show("La ronde numéro" + r.numero + " a été ajouté avec succès");
+                Notification.show("La ronde numéro " + r.numero + " a été ajouté avec succès");
      }
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }

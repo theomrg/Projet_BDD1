@@ -254,7 +254,42 @@ public void update(Connection con) throws SQLException {
         pst.setString(6, this.categorie);
         pst.executeUpdate();
         }
-    }   
+    }  
+
+public static List<Joueur> getJoueursDeLEquipe(int idEquipe) throws SQLException {
+    List<Joueur> list = new ArrayList<>();
+    
+    // Jointure : Joueur -> Composition -> Equipe
+    String sql = "SELECT j.* FROM joueur j " +
+                 "JOIN composition c ON j.id = c.idjoueur " +
+                 "WHERE c.idequipe = ?";
+
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, idEquipe);
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                // Gestion propre de la date (comme vu précédemment)
+                java.sql.Date sqlDate = rs.getDate("dateNaissance");
+                LocalDate dateN = (sqlDate != null) ? sqlDate.toLocalDate() : null;
+
+                Joueur j = new Joueur(
+                    rs.getInt("id"),
+                    rs.getString("surnom"),
+                    rs.getString("categorie"),
+                    rs.getString("prenom"),
+                    rs.getString("nom"),
+                    rs.getString("sexe"),
+                    dateN
+                );
+                list.add(j);
+            }
+        }
+    }
+    return list;
+}
     
     public static void main(String[] args) {
     }
