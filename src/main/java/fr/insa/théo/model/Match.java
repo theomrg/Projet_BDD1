@@ -154,6 +154,14 @@ public void delete(Connection con) throws SQLException {
     
     this.entiteSupprimee();
 }
+public static void setStatutTermine(int idMatch) throws SQLException {
+    String sql = "UPDATE matchs SET statut = 'Terminé' WHERE id = ?";
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setInt(1, idMatch);
+        pst.executeUpdate();
+    }
+}
     
     public static void main(String[] args) {
       

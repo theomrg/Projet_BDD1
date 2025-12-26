@@ -273,6 +273,26 @@ public static List<Equipe> getEquipesDeLaRonde(int idRonde) throws SQLException 
     }
     return list;
 }
+
+public void update(Connection con) throws SQLException {
+    String sql = "UPDATE equipe SET nomEquipe = ? WHERE id = ?";
+    
+    try (PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setString(1, this.nomEquipe); // Le nouveau nom
+        pst.setInt(2, this.getId());      // L'ID de l'équipe à modifier
+        
+        pst.executeUpdate();
+    }
+}
+public static void setScoreEquipe(int idEquipe, int nouveauScore) throws SQLException {
+    String sql = "UPDATE equipe SET score = ? WHERE id = ?";
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setInt(1, nouveauScore);
+        pst.setInt(2, idEquipe);
+        pst.executeUpdate();
+    }
+}
     
     public static void main(String[] args) {
          

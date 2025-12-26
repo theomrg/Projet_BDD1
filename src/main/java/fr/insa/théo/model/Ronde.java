@@ -127,4 +127,15 @@ public void delete(Connection con) throws SQLException {
     
     this.entiteSupprimee();
 }
+public static void setStatutTermine(int idRonde) throws SQLException {
+    String sql = "UPDATE ronde SET statut = 'Fermée' WHERE numéro = ?"; // ou WHERE id = ? selon votre table
+    // ATTENTION : Vérifiez si votre colonne s'appelle 'id' ou 'numero' pour l'identifiant unique
+    // Si vous utilisez l'ID interne : "WHERE id = ?"
+    
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setInt(1, idRonde);
+        pst.executeUpdate();
+    }
+}
 }

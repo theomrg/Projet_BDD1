@@ -38,7 +38,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -47,6 +46,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import fr.insa.beuvron.utils.database.ConnectionPool;
 import fr.insa.théo.model.ConnectionSimpleSGBD;
 import fr.insa.théo.model.Joueur;
 import java.sql.Connection;
@@ -114,9 +114,13 @@ public class HomePage extends VerticalLayout{
         tabs.addThemeVariants(TabsVariant.LUMO_CENTERED);
         tabs.addClassName("full-width-tabs");
         VerticalLayout contenuGauche = new VerticalLayout();
+        contenuGauche.setWidthFull();
         VerticalLayout contenuMid = new VerticalLayout();
+        contenuMid.setWidthFull();
         VerticalLayout contenuMid2 = new VerticalLayout();
+        contenuMid2.setWidthFull();
         VerticalLayout contenuDroit = new VerticalLayout();
+        contenuDroit.setWidthFull();
         HorizontalLayout mepGT = new HorizontalLayout(contenuGauche,contenuMid,contenuMid2,contenuDroit);
         HorizontalLayout mepS = new HorizontalLayout();
         DatePicker.DatePickerI18n i18n = new DatePicker.DatePickerI18n();
@@ -128,8 +132,13 @@ public class HomePage extends VerticalLayout{
         BoutonAjout boutonGenererEquipes = new BoutonAjout("🤝 Générer les équipes du Match");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("🏐 Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("📣 Créer une ronde");
-        BoutonAjout ajoutjoueurbtn = new BoutonAjout("🤾‍♂ ️Ajouter un joueur au tournoi");
+        BoutonAjout ajoutjoueurbtn = new BoutonAjout("🤾‍♂ ️Ajouter un joueur");
         BoutonAjout boutonAleatoire = new BoutonAjout("🎲 Composer aléatoirement les équipes");
+        BoutonAjout btnModifierJoueur = new BoutonAjout("🖊️ Modifier un joueur");
+        BoutonAjout btnCloturerRonde = new BoutonAjout("🏁 Clôturer la Ronde");
+        btnModifierJoueur.setEnabled(false);
+        BoutonAjout btnModifierEquipe = new BoutonAjout("🖊️ Modifier le nom");
+        btnModifierEquipe.setEnabled(false);
         ComboBox<Match> selecteurMatch = new ComboBox<>("Sélectionner un match");
         selecteurMatch.addClassName("glass-combobox");
         ComboBox<Match> selecteurMatchAlea = new ComboBox<>("Sélectionner un match");
@@ -144,18 +153,20 @@ public class HomePage extends VerticalLayout{
         HorizontalLayout hlbutton1 = new HorizontalLayout(tfnuméro,tfstatut);
         HorizontalLayout hlbutton2 = new HorizontalLayout(selecteurRonde);
         HorizontalLayout hlbutton3 = new HorizontalLayout(tfnomEquipe,selecteurMatch);
-        HorizontalLayout hlbutton4 = new HorizontalLayout(tfprénom,tfnom,tfsurnom);
-        HorizontalLayout hlbutton5 = new HorizontalLayout(tfcatégorie,tfsexe,dateN);
-        Details detailsRonde = new Details("🛠️ Créer les Rondes", hlbutton1,créerrondebtn);
+        HorizontalLayout hlbutton4 = new HorizontalLayout(tfprénom,tfnom);
+        HorizontalLayout hlbutton5 = new HorizontalLayout(tfcatégorie,tfsexe);
+        HorizontalLayout hlbutton6 = new HorizontalLayout (tfsurnom,dateN);
+        Details detailsRonde = new Details("🛠️ Créer les Rondes", hlbutton1,créerrondebtn,btnCloturerRonde);
         detailsRonde.addClassName("glass-details");
         Details detailsMatch = new Details("🛠️ Créer les Matchs", hlbutton2,ajoutmatchbtn);
         detailsMatch.addClassName("glass-details");
-        Details detailsEquipe = new Details("🛠️ Créer les Equipes", hlbutton3,boutonGenererEquipes);
+        Details detailsEquipe = new Details("🛠️ Créer les Equipes", hlbutton3,boutonGenererEquipes,btnModifierEquipe);
         detailsEquipe.addClassName("glass-details");
-        Details detailsJoueur = new Details("🛠 Ajouter les joueurs️", hlbutton4,hlbutton5,ajoutjoueurbtn);
+        Details detailsJoueur = new Details("🛠 Ajouter les joueurs️", hlbutton4,hlbutton5,hlbutton6,ajoutjoueurbtn,btnModifierJoueur);
         detailsJoueur.addClassName("glass-details");
         Details detailsCompo = new Details("🛠️ Composer les équipes",selecteurMatchAlea,boutonAleatoire);
         detailsCompo.addClassName("glass-details");
+        
         
        
         
@@ -205,9 +216,8 @@ public class HomePage extends VerticalLayout{
         selecteurEquipe.setPlaceholder("Equipes");
         headerLayout.add(titreColonne, selecteurEquipe);
         grilleJoueurs.addColumn(Joueur::getCategorie).setHeader(headerLayout).setWidth("280px");
-        grilleJoueurs.setHeight("300px");
-        grilleJoueurs.setWidth("500px");
-        grilleJoueurs.setAllRowsVisible(true);
+        grilleJoueurs.setHeight("100%");
+        grilleJoueurs.setWidthFull();
         grilleJoueurs.addClassName("glass-grid-v2");
         grilleJoueurs.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
         hlbutton1.setSpacing(true);
@@ -229,10 +239,9 @@ public class HomePage extends VerticalLayout{
         gridRondes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
         gridRondes.addColumn(Ronde::getNumero).setHeader("Numéro");
         gridRondes.addColumn(Ronde::getStatut).setHeader("Statut");
-        gridRondes.setAllRowsVisible(true);
-        gridRondes.setHeight("300px");
-        gridRondes.setWidth("500px");
-
+        gridRondes.setHeight("100%");
+        gridRondes.setWidthFull();
+        
         // --- 2. Grid des MATCHS ---
         gridMatchs = new Grid<>(Match.class, false);
         gridMatchs.addClassName("glass-grid-v2");
@@ -240,9 +249,9 @@ public class HomePage extends VerticalLayout{
         gridMatchs.addColumn(Match::getId).setHeader("Match");
         gridMatchs.addColumn(Match::getStatut).setHeader("Statut");
         gridMatchs.addColumn(Match::getIdronde).setHeader("Ronde");
-        gridMatchs.setAllRowsVisible(true);
-        gridMatchs.setHeight("300px");
-        gridMatchs.setWidth("500px");
+        gridMatchs.setHeight("100%");
+        gridMatchs.setWidthFull();
+    
 
         // --- 3. Grid des ÉQUIPES ---
         gridEquipes = new Grid<>(Equipe.class, false);
@@ -251,21 +260,21 @@ public class HomePage extends VerticalLayout{
         gridEquipes.addColumn(Equipe::getNomEquipe).setHeader("Nom");
         gridEquipes.addColumn(Equipe::getScore).setHeader("Score");
         gridEquipes.addColumn(Equipe::getIdmatch).setHeader("Match");
-        gridEquipes.setAllRowsVisible(true);
-        gridEquipes.setHeight("300px");
-        gridEquipes.setWidth("500px");
+        gridEquipes.setHeight("100%");
+        gridEquipes.setWidthFull();
         
         // grille de tous les joueurs 
         gridAllJoueurs = new Grid<>(Joueur.class, false);
         gridAllJoueurs.addClassName("glass-grid-v2");
         gridAllJoueurs.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
-        gridAllJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom").setWidth("100px");
+        gridAllJoueurs.addColumn(Joueur::getSurnom).setHeader("Surnom");
         gridAllJoueurs.addColumn(Joueur::getPrénom).setHeader("Prénom");
         gridAllJoueurs.addColumn(Joueur::getNom).setHeader("Nom");
         gridAllJoueurs.addColumn(Joueur::getSexe).setHeader("Sexe");
         gridAllJoueurs.addColumn(Joueur::getDateNaissance).setHeader("Date de Naissance").setWidth("180px");
-        gridAllJoueurs.setHeight("600px");
-        gridAllJoueurs.setWidth("400px");
+        gridAllJoueurs.setHeight("100%");
+        gridAllJoueurs.setWidthFull();
+      
         try {
             gridAllJoueurs.setItems(Joueur.getAllPlayers());
         } catch (SQLException e) {
@@ -275,9 +284,9 @@ public class HomePage extends VerticalLayout{
         
         
         contenuGauche.add(detailsRonde,detailsMatch,detailsEquipe,detailsJoueur,detailsCompo);
-        contenuMid.add(grilleJoueurs,gridEquipes);
-        contenuMid2.add(gridRondes,gridMatchs);
-        contenuDroit.add(gridAllJoueurs);
+        contenuMid.add(gridAllJoueurs);
+        contenuMid2.add(grilleJoueurs,gridEquipes);
+        contenuDroit.add(gridRondes,gridMatchs);
        
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
         this.add(tabs,accueil,mepGT);
@@ -286,6 +295,10 @@ public class HomePage extends VerticalLayout{
         this.setSizeFull();
         mepGT.setPadding(true);
         mepGT.setWidthFull();
+        mepGT.setFlexGrow(1, contenuGauche);
+        mepGT.setFlexGrow(0.5, contenuMid);
+        mepGT.setFlexGrow(3,contenuMid2);
+        mepGT.setFlexGrow(4,contenuDroit);
         mepGT.setJustifyContentMode(JustifyContentMode.CENTER);
         mepS.setPadding(true);
         
@@ -371,8 +384,7 @@ public class HomePage extends VerticalLayout{
         try {
         selecteurEquipe.setItems(Equipe.getAllTeams());
         selecteurEquipe.setItemLabelGenerator(equipe -> 
-        "Nom d'équipe: " + equipe.getNomEquipe() +
-        " | ID: " + equipe.getId()
+        equipe.getNomEquipe()
         ); 
         } catch (SQLException e) {
          e.printStackTrace(); }
@@ -548,7 +560,7 @@ public class HomePage extends VerticalLayout{
         confirmDialog.add("Êtes-vous sûr ? Cette action est irréversible.");
         
         Button btnOui = new Button("Oui, supprimer", click -> {
-            try (Connection con = ConnectionSimpleSGBD.defaultCon()) {
+            try (Connection con = ConnectionPool.getConnection()) {
                 // APPEL DE LA MÉTHODE DU MODÈLE
                 joueur.delete(con);
                 
@@ -566,8 +578,229 @@ public class HomePage extends VerticalLayout{
     
     return boutonSupprimer;
     });
-      
-   
+    
+    // Modification des infos d'un joueur   
+        gridAllJoueurs.addSelectionListener(selection -> {
+        // Si un joueur est sélectionné...
+        if (selection.getFirstSelectedItem().isPresent()) {
+            Joueur j = selection.getFirstSelectedItem().get();
+
+            // 1. On remplit les champs de texte avec ses infos
+            tfsurnom.setValue(j.getSurnom());
+            tfcatégorie.setValue(j.getCategorie());
+            tfprénom.setValue(j.getPrénom());
+            tfnom.setValue(j.getNom());
+            tfsexe.setValue(j.getSexe());
+
+            // 2. On gère la date (attention aux null)
+            if (j.getDateNaissance() != null) {
+                dateN.setValue(j.getDateNaissance());
+            } else {
+                dateN.clear();
+            }
+
+            // 3. On active le mode "Modification"
+            btnModifierJoueur.setEnabled(true);
+            ajoutjoueurbtn.setEnabled(false); // On bloque l'ajout pour éviter les confusions
+
+        } else {
+            // Si on désélectionne (clic dans le vide)...
+            // On vide tous les champs
+            tfsurnom.clear(); tfcatégorie.clear(); tfprénom.clear(); 
+            tfnom.clear(); tfsexe.clear(); dateN.clear();
+
+            // On revient au mode "Ajout" par défaut
+            btnModifierJoueur.setEnabled(false);
+            ajoutjoueurbtn.setEnabled(true);
+        }
+    });
+    btnModifierJoueur.addClickListener(click -> {
+        // 1. On récupère le joueur sélectionné
+        Joueur joueurSelectionne = gridAllJoueurs.asSingleSelect().getValue();
+
+        if (joueurSelectionne != null) {
+            try (Connection con = ConnectionPool.getConnection()) {
+
+                // 2. On met à jour l'objet Java avec ce qui est écrit dans les champs
+                joueurSelectionne.setSurnom(tfsurnom.getValue());
+                joueurSelectionne.setCategorie(tfcatégorie.getValue());
+                joueurSelectionne.setPrénom(tfprénom.getValue());
+                joueurSelectionne.setNom(tfnom.getValue());
+                joueurSelectionne.setSexe(tfsexe.getValue());
+                joueurSelectionne.setDateNaissance(dateN.getValue());
+
+                // 3. On envoie la requête SQL UPDATE
+                joueurSelectionne.update(con);
+
+                Notification.show("Joueur modifié avec succès !");
+
+                // 4. On rafraîchit l'affichage
+                rafraichirToutesLesDonnees();
+
+                // 5. On vide la sélection pour repartir à zéro
+                gridAllJoueurs.deselectAll();
+
+            } catch (SQLException ex) {
+                Notification.show("Erreur de modification : " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    });
+    
+    gridEquipes.addSelectionListener(selection -> {
+    if (selection.getFirstSelectedItem().isPresent()) {
+        Equipe equipe = selection.getFirstSelectedItem().get();
+        
+        // 1. On remplit le champ de texte avec le nom actuel
+        tfnomEquipe.setValue(equipe.getNomEquipe());
+        
+        // 2. On active le bouton de modification
+        btnModifierEquipe.setEnabled(true);
+        boutonGenererEquipes.setEnabled(false); // On évite de générer pendant qu'on modifie
+    } else {
+        // Désélection : On vide et on remet à l'état initial
+        tfnomEquipe.clear();
+        btnModifierEquipe.setEnabled(false);
+        boutonGenererEquipes.setEnabled(true);
+    }
+});
+
+    // modifier le nom d'une équipe
+    btnModifierEquipe.addClickListener(click -> {
+        Equipe equipeSelectionnee = gridEquipes.asSingleSelect().getValue();
+
+        if (equipeSelectionnee != null) {
+            try (Connection con = ConnectionPool.getConnection()) {
+                // 1. Mise à jour de l'objet Java
+                equipeSelectionnee.setNomEquipe(tfnomEquipe.getValue());
+
+                // 2. Mise à jour en Base de Données
+                equipeSelectionnee.update(con);
+
+                Notification.show("Nom de l'équipe modifié !");
+
+                // 3. Rafraîchissement
+                rafraichirToutesLesDonnees();
+                gridEquipes.deselectAll();
+
+            } catch (SQLException ex) {
+                Notification.show("Erreur : " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    });
+    
+    // Saisis des scors, cloture des matchs et de la ronde 
+    gridMatchs.addComponentColumn(match -> {
+    // Si le match est déjà fini, on affiche juste un texte ou un bouton désactivé
+    if ("Terminé".equals(match.getStatut())) {
+        Button btnFini = new Button("Terminé");
+        btnFini.setEnabled(false);
+        return btnFini;
+    }
+
+    // Sinon, on affiche le bouton pour saisir le score
+    Button btnScore = new Button("Score");
+    btnScore.addClassName("glass-button");
+    
+    btnScore.addClickListener(e -> {
+        // 1. On ouvre une boite de dialogue (Pop-up)
+        Dialog dialogScore = new Dialog();
+        dialogScore.setHeaderTitle("Résultat du Match " + match.getId());
+        
+        VerticalLayout content = new VerticalLayout();
+        
+        try {
+            // 2. On récupère les 2 équipes du match
+            List<Equipe> lesEquipes = Equipe.getEquipesDuMatch(match.getId());
+            
+            if (lesEquipes.size() < 2) {
+                Notification.show("Erreur : Il faut 2 équipes pour saisir un score !");
+                return;
+            }
+            
+            Equipe eq1 = lesEquipes.get(0);
+            Equipe eq2 = lesEquipes.get(1);
+            
+            // 3. Champs pour entrer les points (IntegerField est mieux que TextField pour des chiffres)
+            // On utilise TextField avec type number si IntegerField n'est pas dispo dans votre version
+            TextField score1 = new TextField(eq1.getNomEquipe());
+            score1.setPlaceholder("Points");
+            
+            TextField score2 = new TextField(eq2.getNomEquipe());
+            score2.setPlaceholder("Points");
+            
+            content.add(score1, score2);
+            dialogScore.add(content);
+            
+            // 4. Bouton Valider
+            Button valider = new Button("Enregistrer & Clôturer", event -> {
+                try {
+                    int s1 = Integer.parseInt(score1.getValue());
+                    int s2 = Integer.parseInt(score2.getValue());
+                    
+                    // A. On sauvegarde les scores
+                    Equipe.setScoreEquipe(eq1.getId(), s1);
+                    Equipe.setScoreEquipe(eq2.getId(), s2);
+                    
+                    // B. On clôture le match
+                    Match.setStatutTermine(match.getId());
+                    
+                    Notification.show("Scores enregistrés ! Match terminé.");
+                    dialogScore.close();
+                    rafraichirToutesLesDonnees(); // Mise à jour des grilles
+                    
+                } catch (NumberFormatException ex) {
+                    Notification.show("Veuillez entrer des nombres valides !");
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            dialogScore.getFooter().add(new Button("Annuler", c -> dialogScore.close()), valider);
+            dialogScore.open();
+            
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    });
+    
+    return btnScore;
+}).setHeader("Actions");
+    
+    // cloturer une ronde
+    
+
+        btnCloturerRonde.addClickListener(click -> {
+            Ronde ronde = selecteurRonde.getValue();
+            if (ronde == null) {
+                Notification.show("Sélectionnez une ronde d'abord !");
+                return;
+            }
+
+            // Petite sécurité : boite de confirmation
+            Dialog confirm = new Dialog();
+            confirm.setHeaderTitle("Clôturer la Ronde " + ronde.getNumero() + " ?");
+            confirm.add("Êtes-vous sûr ? Cela validera tous les résultats.");
+
+            Button oui = new Button("Oui, Clôturer", e -> {
+                try {
+                    // Appel SQL
+                    Ronde.setStatutTermine(ronde.getId());
+
+                    Notification.show("Ronde clôturée avec succès !");
+                    confirm.close();
+                    rafraichirToutesLesDonnees();
+
+                } catch (SQLException ex) {
+                    Notification.show("Erreur : " + ex.getMessage());
+                }
+            });
+
+            confirm.getFooter().add(new Button("Annuler", e -> confirm.close()), oui);
+            confirm.open();
+        });
+
     }
     private void rafraichirToutesLesDonnees() {
         try {

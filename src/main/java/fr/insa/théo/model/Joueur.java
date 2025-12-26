@@ -237,10 +237,10 @@ public void delete(Connection con) throws SQLException {
 }
 
 public void update(Connection con) throws SQLException {
-        String sql = "UPDATE joueur SET prenom = ?, nom = ?, surnom = ?, sexe = ?, dateNaissance = ?, categorie = ? WHERE id = ?";
-    
+    String sql = "UPDATE joueur SET prenom = ?, nom = ?, surnom = ?, sexe = ?, dateNaissance = ?, categorie = ? WHERE id = ?";
+
     try (PreparedStatement pst = con.prepareStatement(sql)) {
-        // 2. Remplissage des paramètres (ordre 1 à 6)
+        // Paramètres 1 à 6 (Données)
         pst.setString(1, this.prenom);
         pst.setString(2, this.nom);
         pst.setString(3, this.surnom);
@@ -252,9 +252,13 @@ public void update(Connection con) throws SQLException {
             pst.setNull(5, java.sql.Types.DATE);
         }
         pst.setString(6, this.categorie);
+        
+        // Paramètre 7 (L'ID pour savoir QUI modifier) -> C'était l'oubli !
+        pst.setInt(7, this.getId()); 
+        
         pst.executeUpdate();
-        }
-    }  
+    }
+}
 
 public static List<Joueur> getJoueursDeLEquipe(int idEquipe) throws SQLException {
     List<Joueur> list = new ArrayList<>();
