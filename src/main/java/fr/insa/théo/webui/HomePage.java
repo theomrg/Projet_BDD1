@@ -46,8 +46,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.component.textfield.IntegerField;
 import fr.insa.beuvron.utils.database.ConnectionPool;
-import fr.insa.théo.model.ConnectionSimpleSGBD;
 import fr.insa.théo.model.Joueur;
 import java.sql.Connection;
 import java.time.LocalDate;
@@ -136,6 +136,11 @@ public class HomePage extends VerticalLayout{
         BoutonAjout boutonAleatoire = new BoutonAjout("🎲 Composer aléatoirement les équipes");
         BoutonAjout btnModifierJoueur = new BoutonAjout("🖊️ Modifier un joueur");
         BoutonAjout btnCloturerRonde = new BoutonAjout("🏁 Clôturer la Ronde");
+        IntegerField fieldTailleEquipe = new IntegerField("Nombre de joueurs par équipe");
+        fieldTailleEquipe.setValue(4); // Valeur par défaut
+        fieldTailleEquipe.setMin(3);
+        fieldTailleEquipe.setMax(6);
+        fieldTailleEquipe.addClassName("glass-field");
         btnModifierJoueur.setEnabled(false);
         BoutonAjout btnModifierEquipe = new BoutonAjout("🖊️ Modifier le nom");
         btnModifierEquipe.setEnabled(false);
@@ -160,7 +165,7 @@ public class HomePage extends VerticalLayout{
         detailsRonde.addClassName("glass-details");
         Details detailsMatch = new Details("🛠️ Créer les Matchs", hlbutton2,ajoutmatchbtn);
         detailsMatch.addClassName("glass-details");
-        Details detailsEquipe = new Details("🛠️ Créer les Equipes", hlbutton3,boutonGenererEquipes,btnModifierEquipe);
+        Details detailsEquipe = new Details("🛠️ Créer les Equipes", hlbutton3,fieldTailleEquipe,boutonGenererEquipes,btnModifierEquipe);
         detailsEquipe.addClassName("glass-details");
         Details detailsJoueur = new Details("🛠 Ajouter les joueurs️", hlbutton4,hlbutton5,hlbutton6,ajoutjoueurbtn,btnModifierJoueur);
         detailsJoueur.addClassName("glass-details");
@@ -478,10 +483,17 @@ public class HomePage extends VerticalLayout{
     });
        
     //Composition des équipes
+       
+    // fixer le nombre de joueur au début d'une ronde   
+        fieldTailleEquipe.addValueChangeListener(e -> {
+        if (e.getValue() != null) {
+            Equipe.TAILLE_MAX_PAR_EQUIPE = e.getValue();
+            Notification.show("Taille d'équipe fixée à " + e.getValue() + " joueurs.");
+        }
+        
         boutonAleatoire.addClickListener(click -> {
-        Match match = selecteurMatch.getValue();
+        Match match = selecteurMatchAlea.getValue();
         rafraichirToutesLesDonnees();
-        final int MAX_PLAYERS = 6; // La nouvelle limite
 
         if (match == null) {
             Notification.show("Veuillez sélectionner un match d'abord !");
@@ -515,7 +527,7 @@ public class HomePage extends VerticalLayout{
                 int nbJoueursActuels = membresActuels.size();
 
                 // On calcule combien de places il reste avant d'atteindre 6
-                int placesLibres = MAX_PLAYERS - nbJoueursActuels;
+                int placesLibres = e.getValue() - nbJoueursActuels;
 
                 // On remplit les places vides (si des joueurs sont dispos)
                 for (int i = 0; i < placesLibres; i++) {
@@ -531,7 +543,7 @@ public class HomePage extends VerticalLayout{
 
             // 5. Feedback utilisateur
             if (compteurAjouts > 0) {
-                Notification.show(compteurAjouts + " joueurs répartis aléatoirement (Max " + MAX_PLAYERS + "/équipe) !");
+                Notification.show(compteurAjouts + " joueurs répartis aléatoirement (Max " + e.getValue() + "/équipe) !");
 
                 // Si une équipe était sélectionnée, on rafraîchit la grille pour voir le résultat
                 if (selecteurEquipe.getValue() != null) {
@@ -545,6 +557,7 @@ public class HomePage extends VerticalLayout{
             Notification.show("Erreur BDD : " + ex.getMessage());
             ex.printStackTrace();
         }
+    });
     });
     
     //Bouton supprimer un joueur 
@@ -800,6 +813,7 @@ public class HomePage extends VerticalLayout{
             confirm.getFooter().add(new Button("Annuler", e -> confirm.close()), oui);
             confirm.open();
         });
+       
 
     }
     private void rafraichirToutesLesDonnees() {

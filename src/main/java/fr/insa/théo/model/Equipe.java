@@ -293,6 +293,13 @@ public static void setScoreEquipe(int idEquipe, int nouveauScore) throws SQLExce
         pst.executeUpdate();
     }
 }
+public static int TAILLE_MAX_PAR_EQUIPE = 2;
+
+// Méthode utilitaire pour vérifier si une équipe est pleine (utile pour plus tard)
+public static boolean estComplete(int idEquipe) throws SQLException {
+    List<Joueur> joueurs = Joueur.getJoueursDeLEquipe(idEquipe);
+    return joueurs.size() >= TAILLE_MAX_PAR_EQUIPE;
+}
     
     public static void main(String[] args) {
          

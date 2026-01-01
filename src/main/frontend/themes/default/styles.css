@@ -28,16 +28,25 @@ html {
 
 body {
     /* Retire les marges par défaut pour que le fond couvre tout */
-    margin: 0; 
-    height: 100vh;
+    background-image: url('themes/default/fond-page3.png');
     
-    /* Création du dégradé linéaire */
-    background: linear-gradient(
-        135deg, /* Angle du dégradé */
-        var(--mauve-start) 0%, /* Commence par le mauve le plus clair */
-        var(--mauve-end) 100% /* Finit par le mauve légèrement plus soutenu */
-    ); 
+    /* 2. S'assure que l'image couvre TOUT l'écran sans se répéter */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    
+    /* 3. (Important) Fixe l'image pour qu'elle ne bouge pas quand on scrolle */
+    background-attachment: fixed;
+    
+    /* 4. Optionnel : Une couleur de fond de secours si l'image ne charge pas */
+
+    
+    /* On retire les marges par défaut du navigateur */
+    margin: 0;
+    height: 100vh;
 }
+
+
 .bouton-onglet {
     background-color: #6847A1;
     color: white;
@@ -75,7 +84,7 @@ body {
     padding: 10px 20px;
     
     /* 3. Texte et Ombre */
-    color: var(--glass-text-color);
+    color: whitesmoke;
     font-weight: bold;  
     text-shadow: 0 0 5px var(--glass-shadow); /* Ombre très subtile sur le texte */
     box-shadow: 0 4px 6px var(--glass-shadow); /* Ombre douce sous le bouton */
@@ -126,7 +135,7 @@ body {
 
 /* 3. Le Label (Le texte au dessus) */
 .glass-field::part(label) {
-    color: #4a4a4a;           /* Gris foncé lisible */
+    color: whitesmoke;           /* Gris foncé lisible */
     font-weight: 600;         /* Un peu gras */
     margin-bottom: 4px;       /* Petit espace avec le champ */
     font-size: 0.9em;
@@ -151,7 +160,7 @@ body {
 
 /* 1. Le Label (Le titre du menu déroulant) */
 .glass-combobox::part(label) {
-    color: var(--glass-text-color); /* Texte en blanc sur fond sombre */
+    color: whitesmoke; /* Texte en blanc sur fond sombre */
     font-weight: 600;
     margin-bottom: 4px;
     font-size: 0.9em;
@@ -159,7 +168,7 @@ body {
 
 /* 2. La zone de saisie (Le fond du champ) */
 .glass-combobox::part(input-field) {
-    background-color: var(--glass-background); /* Fond transparent */
+    background-color: rgba(255, 255, 255, 0.4); /* Fond transparent */
     border-radius: 12px;
     border: 1px solid var(--glass-border-color); /* Bordure fine blanche */
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); /* Petite ombre interne */
@@ -260,7 +269,7 @@ body {
 
 /* Onglet Sélectionné */
 .full-width-tabs vaadin-tab[selected] {
-    color: #6C5585;                /* Votre Violet */
+    color: black;               /* Votre Violet */
     font-weight: bold;
     background-color: transparent; /* Pas de fond gris par défaut */
 }
@@ -299,7 +308,7 @@ body {
     margin: 10px 0;
     
     font-weight: 700; /* Gras (Bold) */
-    color: var(--glass-text-color); /* Blanc (défini dans votre :root) */
+    color: whitesmoke; /* Blanc (défini dans votre :root) */
     
     /* Petite touche "Design" : améliore la lisibilité sur le fond coloré */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -322,7 +331,7 @@ body {
 /* Le Titre (Résumé) */
 .glass-details::part(summary) {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    color: whitesmoke;  
     font-weight: bold;
     padding: 15px;
     cursor: pointer;
