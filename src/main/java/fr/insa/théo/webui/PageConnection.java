@@ -27,7 +27,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.utils.database.ConnectionPool;
-import static fr.insa.théo.webui.Accueil.append;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,7 +65,7 @@ public class PageConnection extends VerticalLayout {
                 UI.getCurrent().getPage().setLocation("http://localhost:8080/Projet");
 
             } else {
-                append(this.messageta, "Identifiant ou mot de passe incorect");
+               
             }
             } catch (SQLException ex) {
                 Notification.show("problème : " + ex.getMessage());

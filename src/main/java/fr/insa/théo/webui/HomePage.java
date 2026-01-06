@@ -38,6 +38,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -127,8 +128,8 @@ public class HomePage extends VerticalLayout{
         i18n.setDateFormat("dd/MM/yyyy");
         dateN.setI18n(i18n);
         
-        Span accueil = new Span("Bienvenue sur l'éditeur de Tournoi !");
-        accueil.addClassName("texte-custom-gras");
+        H1 titre = new H1("Bienvenue au tournoi de Volley 🤾‍");
+        titre.getStyle().set("filter", "drop-shadow(0 0 10px rgba(99, 102, 241, 0.5))");
         BoutonAjout boutonGenererEquipes = new BoutonAjout("🤝 Générer les équipes du Match");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("🏐 Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("📣 Créer une ronde");
@@ -163,6 +164,7 @@ public class HomePage extends VerticalLayout{
         HorizontalLayout hlbutton6 = new HorizontalLayout (tfsurnom,dateN);
         Details detailsRonde = new Details("🛠️ Créer les Rondes", hlbutton1,créerrondebtn,btnCloturerRonde);
         detailsRonde.addClassName("glass-details");
+        detailsRonde.setOpened(true);
         Details detailsMatch = new Details("🛠️ Créer les Matchs", hlbutton2,ajoutmatchbtn);
         detailsMatch.addClassName("glass-details");
         Details detailsEquipe = new Details("🛠️ Créer les Equipes", hlbutton3,fieldTailleEquipe,boutonGenererEquipes,btnModifierEquipe);
@@ -184,12 +186,12 @@ public class HomePage extends VerticalLayout{
         if (selectedTab.equals(tabGestion)) {
             rafraichirToutesLesDonnees();
             mepGT.setVisible(true);
-            mepS.setVisible(false);
         } else if (selectedTab.equals(tabStats)) {
             mepGT.setVisible(false);
-            mepS.setVisible(true);
+            UI.getCurrent().getPage().setLocation("http://localhost:8080/Statistiques");
+            
         } else if(selectedTab.equals(tabaide)) {
-             Dialog guide = new Dialog();
+            Dialog guide = new Dialog();
             guide.setHeaderTitle("Bienvenue dans le Gestionnaire de Tournoi !");
             VerticalLayout contenu = new VerticalLayout();
             contenu.setSpacing(false);
@@ -294,10 +296,11 @@ public class HomePage extends VerticalLayout{
         contenuDroit.add(gridRondes,gridMatchs);
        
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
-        this.add(tabs,accueil,mepGT);
+        this.add(tabs,titre,mepGT);
         this.setPadding(false);
         this.setSpacing(false);
         this.setSizeFull();
+        this.setAlignItems(Alignment.CENTER);
         mepGT.setPadding(true);
         mepGT.setWidthFull();
         mepGT.setFlexGrow(1, contenuGauche);
@@ -306,6 +309,7 @@ public class HomePage extends VerticalLayout{
         mepGT.setFlexGrow(4,contenuDroit);
         mepGT.setJustifyContentMode(JustifyContentMode.CENTER);
         mepS.setPadding(true);
+        rafraichirToutesLesDonnees();
         
      
         
@@ -564,7 +568,7 @@ public class HomePage extends VerticalLayout{
     grilleJoueurs.addComponentColumn(joueur -> {
     
     Button boutonSupprimer = new Button(new Icon(VaadinIcon.TRASH));
-    boutonSupprimer.addClassName("glass-button");
+    boutonSupprimer.addClassName("black-glass-button");
     
     boutonSupprimer.addClickListener(e -> {
         // --- Création d'une boite de dialogue de confirmation ---
@@ -587,6 +591,7 @@ public class HomePage extends VerticalLayout{
         Button btnNon = new Button("Annuler", click -> confirmDialog.close());
         confirmDialog.getFooter().add(btnNon, btnOui);
         confirmDialog.open();
+        rafraichirToutesLesDonnees();
     });
     
     return boutonSupprimer;
@@ -714,7 +719,7 @@ public class HomePage extends VerticalLayout{
 
     // Sinon, on affiche le bouton pour saisir le score
     Button btnScore = new Button("Score");
-    btnScore.addClassName("glass-button");
+    btnScore.addClassName("black-glass-button");
     
     btnScore.addClickListener(e -> {
         // 1. On ouvre une boite de dialogue (Pop-up)

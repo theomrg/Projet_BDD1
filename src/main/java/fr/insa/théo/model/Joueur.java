@@ -41,6 +41,7 @@ private String prenom;
 private String nom;
 private String sexe;
 private LocalDate dateNaissance;
+private int scoreCalculé = 0;
 
 
     public Joueur(String surnom, String categorie, String prenom, String nom, String sexe, LocalDate dateNaissance) {
@@ -109,6 +110,11 @@ private LocalDate dateNaissance;
     public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
+    
+    public int getScoreCalculé() { 
+        return scoreCalculé; }
+    
+    public void setScoreCalculé(int scoreCalculé) { this.scoreCalculé = scoreCalculé; }
 
     @Override
     public String toString() {
@@ -148,29 +154,40 @@ public static void créerJoueur(String a,String b,String c,String d,String e,Loc
 }
 
 public static List<Joueur> getAllPlayers() throws SQLException {
-    List<Joueur> listeJoueurs = new ArrayList<>();
+    List<Joueur> list = new ArrayList<>();
     
-    // 1. Connexion et Requête
-    try (Connection con = ConnectionPool.getConnection(); 
+    // Cette requête récupère les infos du joueur ET la somme des scores de ses équipes
+    // COALESCE(SUM(...), 0) sert à mettre 0 si le joueur n'a pas d'équipe (au lieu de null)
+    String sql = "SELECT j.*, COALESCE(SUM(e.score), 0) as total_points " +
+                 "FROM joueur j " +
+                 "LEFT JOIN composition c ON j.id = c.idjoueur " +
+                 "LEFT JOIN equipe e ON c.idequipe = e.id " +
+                 "GROUP BY j.id"; // On groupe par joueur pour faire la somme
+
+    try (Connection con = ConnectionPool.getConnection();
          Statement st = con.createStatement();
-         ResultSet rs = st.executeQuery("SELECT * FROM joueur")) { 
-         while (rs.next()) {
-            int id = rs.getInt("id");
-            String surnom = rs.getString("surnom");
-            String categorie = rs.getString("categorie");
-            String prenom = rs.getString("prenom");
-            String nom = rs.getString("nom");
-            String sexe = rs.getString("sexe");
-            java.sql.Date sqlDate = rs.getDate("dateNaissance");
-            LocalDate dateN = null;
-            if (sqlDate != null) {
-                dateN = sqlDate.toLocalDate();
-            }
-            Joueur j = new Joueur(id, surnom, categorie, prenom, nom, sexe, dateN);
-            listeJoueurs.add(j);
+         ResultSet rs = st.executeQuery(sql)) {
+         
+        while (rs.next()) {
+            // Création du joueur (adaptez selon votre constructeur)
+            Joueur j = new Joueur(
+                rs.getInt("id"),
+                rs.getString("surnom"),
+                rs.getString("categorie"),
+                rs.getString("prenom"),
+                rs.getString("nom"),
+                rs.getString("sexe"),
+                rs.getDate("dateNaissance") != null ? rs.getDate("dateNaissance").toLocalDate() : null
+            );
+            
+            // On récupère le score calculé par le SQL
+            j.setScoreCalculé(rs.getInt("total_points"));
+            
+
+            list.add(j);
         }
     }
-    return listeJoueurs;
+    return list;
 }
 public static boolean estDejaInscritDansRonde(int idjoueur, int idronde) throws SQLException {
     // La requête fait une triple jointure pour remonter du Joueur jusqu'à la Ronde
@@ -293,6 +310,28 @@ public static List<Joueur> getJoueursDeLEquipe(int idEquipe) throws SQLException
         }
     }
     return list;
+}
+
+public int getScoreTotal() {
+    // La requête magique : Somme des scores des équipes liées à ce joueur
+    String sql = "SELECT SUM(e.score) FROM equipe e " +
+                 "JOIN composition c ON e.id = c.idequipe " +
+                 "WHERE c.idjoueur = ?";
+                 
+    try (Connection con = ConnectionPool.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+         
+        pst.setInt(1, this.getId());
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1); // Retourne la somme (ou 0 si null)
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0; // En cas d'erreur ou si le joueur n'a pas joué
 }
     
     public static void main(String[] args) {
