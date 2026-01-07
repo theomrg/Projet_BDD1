@@ -63,14 +63,7 @@ public class PageConnection extends VerticalLayout {
         this.setSizeFull(); // Prend tout l'écran
         this.setAlignItems(Alignment.CENTER); // Centre horizontalement
         this.setJustifyContentMode(JustifyContentMode.CENTER); // Centre verticalement
-        
-        // Optionnel : Image de fond pour bien voir l'effet glass
-        // this.getStyle().set("background-image", "url('themes/default/fond-page.jpg')");
-        // this.getStyle().set("background-size", "cover");
-
-        // --- 2. Création des composants ---
         H1 titre = new H1("Connexion au tournoi 🌐");
-        
         Tab tabLogin = new Tab("Se connecter");
         Tab tabSignup = new Tab("Créer un compte");
         tabs = new Tabs(tabLogin, tabSignup);
@@ -78,7 +71,7 @@ public class PageConnection extends VerticalLayout {
         tabs.setWidthFull(); 
         tabs.addThemeVariants(TabsVariant.LUMO_CENTERED);
         
-        // Disclaimer (on garde votre classe CSS précédente)
+       
         disclaimer = new Span();
         Icon icon = new Icon(VaadinIcon.INFO_CIRCLE);
         disclaimer.add(icon);
@@ -103,11 +96,10 @@ public class PageConnection extends VerticalLayout {
         VerticalLayout glassCard = new VerticalLayout();
         glassCard.addClassName("glass-card"); // APPLIQUER LE STYLE CSS ICI
         
-        // On ajoute les composants DANS la carte, pas directement dans la page
+        
         glassCard.add(titre, tabs, disclaimer, idField, mdpField, actionButton);
         
-        // Configuration de la carte (l'espacement est géré par le CSS .glass-card gap, 
-        // mais on peut désactiver le spacing par défaut de Vaadin pour éviter les doubles marges)
+      
         glassCard.setSpacing(false); 
         glassCard.setPadding(false); 
         glassCard.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -133,11 +125,11 @@ public class PageConnection extends VerticalLayout {
             }
         });
 
-        // --- 5. Ajout de la carte au layout principal ---
+       
         this.add(glassCard);
     }
 
-    // ... Les méthodes login() et register() restent identiques ...
+    
     
     private void login() {
         String identifiant = idField.getValue();

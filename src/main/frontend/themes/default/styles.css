@@ -518,3 +518,54 @@ black-glass-button {
     color: white;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
+
+h1 {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: white;
+    font-size: 2.5rem;       /* Très grand */
+    font-weight: 800;        /* Très gras */
+    letter-spacing: 1px;     /* Espacement léger entre les lettres */
+    margin-bottom: 30px;     /* Espace sous le titre */
+    text-align: center;      /* Centré par défaut */
+    
+    /* Petite ombre portée pour le détacher du fond */
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* --- H2 : Les Titres de Section (ex: "Résultats des Matchs") --- */
+h2 {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    color: #f0f0f0;          /* Blanc cassé (moins agressif) */
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 40px;        /* Espace avant */
+    margin-bottom: 20px;     /* Espace après */
+    
+    /* Une petite ligne décorative en dessous (Gradient) */
+    position: relative;
+    display: inline-block;   /* Pour que la ligne s'arrête au texte */
+}
+
+/* La ligne décorative sous le H2 */
+h2::after {
+    content: '';
+    display: block;
+    width: 60%;              /* La ligne fait 60% de la largeur du texte */
+    height: 4px;             /* Épaisseur */
+    background: linear-gradient(90deg, #6366f1, #a5b4fc); /* Violet -> Bleu clair */
+    border-radius: 2px;
+    margin-top: 8px;
+}
+
+/* --- H3 : Les Titres de Cartes ou de Grilles --- */
+h3 {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    color: white;
+    font-size: 1.0rem;
+    font-weight: 500;
+    text-transform: uppercase; /* Majuscules pour faire "Titre technique" */
+    letter-spacing: 1.5px;     /* Lettres espacées */
+    opacity: 0.9;              /* Légèrement transparent */
+    margin-bottom: 5px;
+   
+}

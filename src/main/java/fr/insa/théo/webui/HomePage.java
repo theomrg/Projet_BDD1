@@ -108,6 +108,13 @@ public class HomePage extends VerticalLayout{
         this.tfnomEquipe.addClassName("glass-field");
        
         
+        
+        H1 titre = new H1("🏆 Bienvenue au tournoi de Volley 🏆");
+        H3 hjoueur = new H3("Tous les joueurs du tournoi");
+        H3 hronde = new H3("Toutes les rondes du tournoi");
+        H3 hmatch = new H3("Tous les matchs du tournoi");
+        H3 héquipe = new H3("Toutes les équipes de la ronde sélectionnée");
+        H3 hjoueurdeléquipe = new H3("Tous les joueurs de l'équipe sélectionnée");
         Tab tabGestion = new Tab("Gérer le Tournoi");
         Tab tabStats = new Tab("Statistiques");
         Tab tabCon = new Tab("Connection");
@@ -130,8 +137,7 @@ public class HomePage extends VerticalLayout{
         i18n.setDateFormat("dd/MM/yyyy");
         dateN.setI18n(i18n);
         
-        H1 titre = new H1("Bienvenue au tournoi de Volley 🤾‍");
-        titre.getStyle().set("filter", "drop-shadow(0 0 10px rgba(99, 102, 241, 0.5))");
+        
         BoutonAjout boutonGenererEquipes = new BoutonAjout("🤝 Générer les équipes du Match");
         BoutonAjout ajoutmatchbtn = new BoutonAjout("🏐 Ajouter un match");
         BoutonAjout créerrondebtn = new BoutonAjout("📣 Créer une ronde");
@@ -177,11 +183,7 @@ public class HomePage extends VerticalLayout{
         detailsCompo.addClassName("glass-details");
         Details detailsid = new Details("🛠️ Getion des identifiants");
         detailsid.addClassName("glass-details");
-        
-        
-       
-        
-        
+
         //Barre d'onglets
         mepS.setVisible(false);
         mepS.add(new H2("Statistiques"), new Paragraph("Contenu à venir..."));
@@ -304,10 +306,9 @@ public class HomePage extends VerticalLayout{
                 // Action au clic
                 btnPromouvoir.addClickListener(e -> {
                     try {
-                        // Appel de la méthode du modèle
                         user.devenirAdmin();
                         Notification.show(user.getIdentifiant() + " est maintenant Administrateur !");
-                        rafraichirToutesLesDonnees(); // Mise à jour visuelle
+                        rafraichirToutesLesDonnees(); 
                     } catch (SQLException ex) {
                         Notification.show("Erreur : " + ex.getMessage());
                         ex.printStackTrace();
@@ -317,7 +318,7 @@ public class HomePage extends VerticalLayout{
             return btnPromouvoir;
         }).setHeader("Action"); 
         gridUsers.setWidthFull();
-        gridUsers.setHeight("200px");
+        gridUsers.setHeight("150px");
         detailsid.add(gridUsers);
       
         try {
@@ -329,9 +330,9 @@ public class HomePage extends VerticalLayout{
         
         
         contenuGauche.add(detailsRonde,detailsMatch,detailsEquipe,detailsJoueur,detailsCompo,detailsid);
-        contenuMid.add(gridAllJoueurs);
-        contenuMid2.add(grilleJoueurs,gridEquipes);
-        contenuDroit.add(gridRondes,gridMatchs);
+        contenuMid.add(hjoueur,gridAllJoueurs);
+        contenuMid2.add(hjoueurdeléquipe,grilleJoueurs,héquipe,gridEquipes);
+        contenuDroit.add(hronde,gridRondes,hmatch,gridMatchs);
        
         // Ajout de tous les composants dans le VerticalLayout (Vue principale)
         this.add(tabs,titre,mepGT);
@@ -376,8 +377,6 @@ public class HomePage extends VerticalLayout{
             // 3. On met à jour les sélecteurs
                 selecteurMatch.setItems(matchsDeLaRonde);
                 selecteurEquipe.setItems(equipesDeLaRonde);
-
-                // 3. On filtre la grille des ÉQUIPES pour ne voir que celles de cette ronde
                 if (gridEquipes != null) {
                     gridEquipes.setItems(Equipe.getEquipesDeLaRonde(idRonde));
                 }
@@ -389,7 +388,7 @@ public class HomePage extends VerticalLayout{
                 e.printStackTrace(); 
         }
         } else {
-            // Si on a tout désélectionné (Ronde = vide), on vide les listes déroulantes
+
             selecteurMatch.setItems(new ArrayList<>());
             selecteurEquipe.setItems(new ArrayList<>());
             rafraichirToutesLesDonnees();
@@ -403,11 +402,11 @@ public class HomePage extends VerticalLayout{
                 Ronde.créerRonde(numéro, statut);
                 rafraichirToutesLesDonnees();
         });
+        
         // Création des matchs
         ajoutmatchbtn.addClickListener(a -> {
             Ronde rondeSelectionnee = selecteurRonde.getValue();
                 if (rondeSelectionnee != null) {
-                    // On appelle la méthode modifiée en passant tout l'objet
                     Match.créerMatch(rondeSelectionnee); 
                     rafraichirToutesLesDonnees();
                 } else {
@@ -439,15 +438,12 @@ public class HomePage extends VerticalLayout{
         
         boutonGenererEquipes.addClickListener(click -> {
             Match match = selecteurMatch.getValue();
-
-            // Vérification de base
             if (match == null) {
                 Notification.show("Veuillez sélectionner un match d'abord !");
                 return;
             }
 
         try {
-            // 1. On regarde combien d'équipes existent déjà pour ce match
             List<Equipe> equipesActuelles = Equipe.getEquipesDuMatch(match.getId());
             int nbEquipes = equipesActuelles.size();
 
@@ -520,7 +516,7 @@ public class HomePage extends VerticalLayout{
                 e.printStackTrace();
             }
         } else {
-            grilleJoueurs.setItems(); // On vide si rien n'est sélectionné
+            grilleJoueurs.setItems();
         }
     });
        
@@ -582,8 +578,6 @@ public class HomePage extends VerticalLayout{
                     compteurAjouts++;
                 }
             }
-
-            // 5. Feedback utilisateur
             if (compteurAjouts > 0) {
                 Notification.show(compteurAjouts + " joueurs répartis aléatoirement (Max " + e.getValue() + "/équipe) !");
 
@@ -609,14 +603,12 @@ public class HomePage extends VerticalLayout{
     boutonSupprimer.addClassName("black-glass-button");
     
     boutonSupprimer.addClickListener(e -> {
-        // --- Création d'une boite de dialogue de confirmation ---
         Dialog confirmDialog = new Dialog();
         confirmDialog.setHeaderTitle("Supprimer " + joueur.getSurnom() + " ?");
         confirmDialog.add("Êtes-vous sûr ? Cette action est irréversible.");
         
         Button btnOui = new Button("Oui, supprimer", click -> {
             try (Connection con = ConnectionPool.getConnection()) {
-                // APPEL DE LA MÉTHODE DU MODÈLE
                 joueur.delete(con);
                 
                 Notification.show("Joueur supprimé.");
@@ -641,14 +633,11 @@ public class HomePage extends VerticalLayout{
         if (selection.getFirstSelectedItem().isPresent()) {
             Joueur j = selection.getFirstSelectedItem().get();
 
-            // 1. On remplit les champs de texte avec ses infos
             tfsurnom.setValue(j.getSurnom());
             tfcatégorie.setValue(j.getCategorie());
             tfprénom.setValue(j.getPrénom());
             tfnom.setValue(j.getNom());
             tfsexe.setValue(j.getSexe());
-
-            // 2. On gère la date (attention aux null)
             if (j.getDateNaissance() != null) {
                 dateN.setValue(j.getDateNaissance());
             } else {
@@ -660,8 +649,6 @@ public class HomePage extends VerticalLayout{
             ajoutjoueurbtn.setEnabled(false); // On bloque l'ajout pour éviter les confusions
 
         } else {
-            // Si on désélectionne (clic dans le vide)...
-            // On vide tous les champs
             tfsurnom.clear(); tfcatégorie.clear(); tfprénom.clear(); 
             tfnom.clear(); tfsexe.clear(); dateN.clear();
 
@@ -684,8 +671,6 @@ public class HomePage extends VerticalLayout{
                 joueurSelectionne.setNom(tfnom.getValue());
                 joueurSelectionne.setSexe(tfsexe.getValue());
                 joueurSelectionne.setDateNaissance(dateN.getValue());
-
-                // 3. On envoie la requête SQL UPDATE
                 joueurSelectionne.update(con);
 
                 Notification.show("Joueur modifié avec succès !");
@@ -767,7 +752,6 @@ public class HomePage extends VerticalLayout{
         VerticalLayout content = new VerticalLayout();
         
         try {
-            // 2. On récupère les 2 équipes du match
             List<Equipe> lesEquipes = Equipe.getEquipesDuMatch(match.getId());
             
             if (lesEquipes.size() < 2) {
@@ -777,9 +761,6 @@ public class HomePage extends VerticalLayout{
             
             Equipe eq1 = lesEquipes.get(0);
             Equipe eq2 = lesEquipes.get(1);
-            
-            // 3. Champs pour entrer les points (IntegerField est mieux que TextField pour des chiffres)
-            // On utilise TextField avec type number si IntegerField n'est pas dispo dans votre version
             TextField score1 = new TextField(eq1.getNomEquipe());
             score1.setPlaceholder("Points");
             
@@ -825,16 +806,13 @@ public class HomePage extends VerticalLayout{
 }).setHeader("Actions");
     
     // cloturer une ronde
-    
-
+   
         btnCloturerRonde.addClickListener(click -> {
             Ronde ronde = selecteurRonde.getValue();
             if (ronde == null) {
                 Notification.show("Sélectionnez une ronde d'abord !");
                 return;
             }
-
-            // Petite sécurité : boite de confirmation
             Dialog confirm = new Dialog();
             confirm.setHeaderTitle("Clôturer la Ronde " + ronde.getNumero() + " ?");
             confirm.add("Êtes-vous sûr ? Cela validera tous les résultats.");
