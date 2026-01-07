@@ -188,7 +188,7 @@ public class HomePage extends VerticalLayout{
             mepGT.setVisible(true);
         } else if (selectedTab.equals(tabStats)) {
             mepGT.setVisible(false);
-            UI.getCurrent().getPage().setLocation("http://localhost:8080/Statistiques");
+            UI.getCurrent().navigate("http://localhost:8080/Statistiques");
             
         } else if(selectedTab.equals(tabaide)) {
             Dialog guide = new Dialog();
@@ -208,7 +208,7 @@ public class HomePage extends VerticalLayout{
             guide.getFooter().add(boutonCompris); 
             guide.open();   
         } else if(selectedTab.equals(tabCon)) {
-            UI.getCurrent().getPage().setLocation("http://localhost:8080");
+            UI.getCurrent().navigate("http://localhost:8080/Connexion");
         }
     });
         grilleJoueurs = new Grid<>(Joueur.class, false);
@@ -819,6 +819,8 @@ public class HomePage extends VerticalLayout{
             confirm.open();
         });
        
+// Affichage de tous les identifiants et modification de leur role 
+
 
     }
     private void rafraichirToutesLesDonnees() {

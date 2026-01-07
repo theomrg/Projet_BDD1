@@ -77,10 +77,10 @@ public class GestionSchema {
                         + ") "   );
                 
                 st.executeUpdate("create table utilisateurs ("
-                        + " idutilisateur int,"
-                        + " foreign key (idutilisateur) references joueur(id),"
-                        + " mdp varchar(20), "
-                        + " profil varchar(20) "
+                        + ConnectionSimpleSGBD.sqlForGeneratedKeys(con, "id") + ","
+                        + " identifiant varchar(30) not null unique,"
+                        + " mdp varchar(30) not null, "
+                        + " role varchar(20) not null "
                         + ") "   );
            
                 

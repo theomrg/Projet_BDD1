@@ -1,12 +1,14 @@
 package fr.insa.théo.webui;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
+@Route(value = "Connexion")
 @Theme("default")
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 

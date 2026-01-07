@@ -79,6 +79,7 @@ public class Statistiques extends VerticalLayout {
         grid.addColumn(Joueur::getPrénom).setHeader("Prénom");
         grid.addColumn(Joueur::getNom).setHeader("Nom");
         grid.addColumn(Joueur::getCategorie).setHeader("Catégorie");
+        grid.setHeight("100%");
         
         // Colonne Score
         grid.addColumn(Joueur::getScoreCalculé).setHeader("Total Points").setSortable(true);
@@ -141,7 +142,7 @@ public class Statistiques extends VerticalLayout {
                 detailsRonde.setWidthFull();
 
                 // On laisse ouvert pour voir direct
-                detailsRonde.setOpened(true);
+                detailsRonde.setOpened(false);
 
                 List<MatchResultatDTO> resultats = chargerResultatsDeLaRonde(r.getId());
 

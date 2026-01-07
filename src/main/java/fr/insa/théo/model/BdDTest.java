@@ -28,94 +28,14 @@ import java.sql.SQLException;
 public class BdDTest {
 
     public static void createBdDTestV1(Connection con) throws SQLException {
-        try (PreparedStatement pst = con.prepareStatement("insert into matchs(ronde) values (?)")) {
-            pst.setInt(1, 1);
-            pst.executeUpdate();
-            pst.setInt(1, 1);
-            pst.executeUpdate();
-        } 
-        try (PreparedStatement pst = con.prepareStatement("insert into joueur(surnom,categorie,taillecm) values (?,?,?)")) {
-            pst.setString(1, "Valou");
-            pst.setString(2, "S");
-            pst.setInt(3, 180);
-            pst.executeUpdate();
-            pst.setString(1, "Aude");
-            pst.setString(2, "J");
-            pst.setInt(3, 160);
-            pst.executeUpdate();
-            pst.setString(1, "Théo");
-            pst.setString(2, " ");
-            pst.setInt(3,0);
-            pst.executeUpdate();
-            pst.setString(1, "Gaétan");
-            pst.setString(2, " ");
-            pst.setInt(3,170);
-            pst.executeUpdate();
-            pst.setString(1, "Karmann");
-            pst.setString(2, "J");
-            pst.setInt(3,190);
+        
+        try (PreparedStatement pst = con.prepareStatement("insert utilisateurs (identifiant, mdp, role) values (?,?,?)")) {
+            pst.setString(1,"admin");
+            pst.setString(2, "test");
+            pst.setString(3,"ADMIN");
             pst.executeUpdate();
         } 
-        try (PreparedStatement pst = con.prepareStatement("insert into equipe(num,score,idmatch) values (?,?,?)")) {
-            pst.setInt(1, 6);
-            pst.setInt(2, 10);
-            pst.setInt(3, 1);
-            pst.executeUpdate();
-            pst.setInt(1, 6);
-            pst.setInt(2, 15);
-            pst.setInt(3, 1);
-            pst.executeUpdate();
-            pst.setInt(1, 6);
-            pst.setInt(2, 12);
-            pst.setInt(3, 2);
-            pst.executeUpdate();
-            pst.setInt(1, 6);
-            pst.setInt(2, 5);
-            pst.setInt(3, 2);
-            pst.executeUpdate();
-        } 
-         try (PreparedStatement pst = con.prepareStatement("insert into composition(idequipe,idjoueur) values (?,?)")) {
-            pst.setInt(1, 1);
-            pst.setInt(2, 1);
-            pst.executeUpdate();
-            pst.setInt(1, 1);
-            pst.setInt(2, 2);
-            pst.executeUpdate(); 
-            pst.setInt(1, 2);
-            pst.setInt(2, 3);
-            pst.executeUpdate();
-            pst.setInt(1, 2);
-            pst.setInt(2, 4);
-            pst.executeUpdate();
-            pst.setInt(1, 3);
-            pst.setInt(2, 5);
-            pst.executeUpdate();
-            pst.setInt(1, 3);
-            pst.setInt(2, 3);
-            pst.executeUpdate();
-            pst.setInt(1, 4);
-            pst.setInt(2, 4);
-            pst.executeUpdate();
-            pst.setInt(1, 4);
-            pst.setInt(2, 2);
-            pst.executeUpdate();
-        }
-         try (PreparedStatement pst = con.prepareStatement("insert into utilisateurs(idutilisateur,mdp,profil) values (?,?,?)")) {
-            pst.setString(1, "m3_tmaringer01");
-            pst.setString(2, "8120c063");
-            pst.setString(3, "admin");
-            pst.executeUpdate();
-            pst.setString(1, "m3_alefevre01");
-            pst.setString(2, "123456"); 
-            pst.setString(3, "util");
-            pst.executeUpdate();
-         }
-         try (PreparedStatement pst = con.prepareStatement("insert into equipe(num) values (?)")) {
-             pst.setInt(1, 14);
-             pst.executeUpdate();
-             
-             
-         }
+        
     }
 
     public BdDTest() {
