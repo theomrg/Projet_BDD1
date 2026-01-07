@@ -18,6 +18,7 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -50,7 +51,13 @@ public class Statistiques extends VerticalLayout {
 
         H1 titre = new H1("🏆 Classement Général");
         titre.getStyle().set("filter", "drop-shadow(0 0 10px rgba(99, 102, 241, 0.5))");
-        // --- 1. CHARGEMENT ET TRI DES DONNÉES ---
+        BoutonAjout retourConnexion = new BoutonAjout("Changer d'utilisateur 🌐");
+        retourConnexion.setWidth("20%");
+        retourConnexion.addClickListener(click -> {
+            UI.getCurrent().navigate("http://localhost:8080/Connexion");
+        });
+        
+       
         List<Joueur> tousLesJoueurs;
         try {
             tousLesJoueurs = Joueur.getAllPlayers();
@@ -116,7 +123,8 @@ public class Statistiques extends VerticalLayout {
 
         // --- 5. REMPLISSAGE FINAL ---
         grid.setItems(tousLesJoueurs);
-        add(titre, grid);
+        add(titre,retourConnexion, grid);
+        this.setJustifyContentMode(JustifyContentMode.CENTER);
         
         H2 titreMatchs = new H2("⚔️ Résultats des Matchs");
         titreMatchs.getStyle().set("font-size", "2em").set("margin-top", "40px");
@@ -168,7 +176,7 @@ public class Statistiques extends VerticalLayout {
                 gridMatchs.addColumn(MatchResultatDTO::getNomEquipe2).setHeader("Equipe B").setAutoWidth(true);
 
                 gridMatchs.setItems(resultats);
-                detailsRonde.setContent(gridMatchs);
+                detailsRonde.add(gridMatchs);
 
                 // 3. On ajoute le Details dans le conteneur horizontal (et pas direct dans la page)
                 conteneurRondes.add(detailsRonde);

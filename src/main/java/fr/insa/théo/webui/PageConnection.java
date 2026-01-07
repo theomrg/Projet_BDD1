@@ -18,6 +18,7 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.théo.webui;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -30,6 +31,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
@@ -50,63 +52,79 @@ import java.sql.SQLException;
 @PageTitle("Connexion")
 public class PageConnection extends VerticalLayout {
 
-    // Composants graphiques
     private TextField idField;
     private PasswordField mdpField;
     private Button actionButton;
-    private Span disclaimer; // Le message d'avertissement
-    
+    private Span disclaimer; 
     private Tabs tabs;
 
     public PageConnection() {
-        this.setAlignItems(Alignment.CENTER);
-        this.setJustifyContentMode(JustifyContentMode.CENTER);
-        this.setSizeFull();
-
-        H1 titre = new H1("Bienvenue au Tournoi 🏐");
+        // --- 1. Configuration du Layout Principal (L'écran entier) ---
+        this.setSizeFull(); // Prend tout l'écran
+        this.setAlignItems(Alignment.CENTER); // Centre horizontalement
+        this.setJustifyContentMode(JustifyContentMode.CENTER); // Centre verticalement
         
-        // --- Onglets ---
+        // Optionnel : Image de fond pour bien voir l'effet glass
+        // this.getStyle().set("background-image", "url('themes/default/fond-page.jpg')");
+        // this.getStyle().set("background-size", "cover");
+
+        // --- 2. Création des composants ---
+        H1 titre = new H1("Connexion au tournoi 🌐");
+        
         Tab tabLogin = new Tab("Se connecter");
         Tab tabSignup = new Tab("Créer un compte");
         tabs = new Tabs(tabLogin, tabSignup);
+        // On enlève le style inline précédent pour laisser le CSS gérer ou garder simple
+        tabs.setWidthFull(); 
+        tabs.addThemeVariants(TabsVariant.LUMO_CENTERED);
         
-        // --- Disclaimer (Caché par défaut) ---
+        // Disclaimer (on garde votre classe CSS précédente)
         disclaimer = new Span();
-        disclaimer.add(new Icon(VaadinIcon.INFO_CIRCLE));
-        disclaimer.add(" Important : Votre identifiant doit être au format 'Prénom.Nom' (ex: Jean.Dupont)");
-        disclaimer.getElement().getThemeList().add("badge error"); // Style rouge/alerte
-        disclaimer.setVisible(false); // On ne l'affiche que pour l'inscription
-        disclaimer.getStyle().set("padding", "10px");
+        Icon icon = new Icon(VaadinIcon.INFO_CIRCLE);
+        disclaimer.add(icon);
+        disclaimer.add(new Text(" Format requis pour l'identifiant : prénom.nom"));
+        disclaimer.addClassName("glass-disclaimer"); // Votre classe existante
+        disclaimer.setVisible(false);
+        disclaimer.setWidthFull(); // Pour qu'il prenne la largeur de la carte
         
-        // --- Champs ---
         idField = new TextField("Identifiant");
-        idField.setWidth("300px");
-        idField.setPlaceholder("prenom.nom"); // Petit indice visuel
+        idField.setWidthFull(); // Prend la largeur de la carte
+        idField.setPlaceholder("prenom.nom");
         
         mdpField = new PasswordField("Mot de passe");
-        mdpField.setWidth("300px");
+        mdpField.setWidthFull(); // Prend la largeur de la carte
 
-        // --- Bouton ---
         actionButton = new Button("Connexion");
+        actionButton.addClassName("glass-button");
         actionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        actionButton.setWidth("300px");
+        actionButton.setWidthFull(); // Bouton large
         
-        // Logique de changement d'onglet
+        // --- 3. Création du Sous-Layout "Glass Card" ---
+        VerticalLayout glassCard = new VerticalLayout();
+        glassCard.addClassName("glass-card"); // APPLIQUER LE STYLE CSS ICI
+        
+        // On ajoute les composants DANS la carte, pas directement dans la page
+        glassCard.add(titre, tabs, disclaimer, idField, mdpField, actionButton);
+        
+        // Configuration de la carte (l'espacement est géré par le CSS .glass-card gap, 
+        // mais on peut désactiver le spacing par défaut de Vaadin pour éviter les doubles marges)
+        glassCard.setSpacing(false); 
+        glassCard.setPadding(false); 
+        glassCard.setJustifyContentMode(JustifyContentMode.CENTER);
+        // --- 4. Logique des onglets ---
         tabs.addSelectedChangeListener(event -> {
             boolean isInscription = event.getSelectedTab().equals(tabSignup);
-            
             if (isInscription) {
                 actionButton.setText("S'inscrire");
-                disclaimer.setVisible(true); // Afficher le disclaimer
-                idField.setHelperText("Format requis : prénom.nom");
+                disclaimer.setVisible(true);
+                idField.setHelperText("Ex: Jean.Dupont");
             } else {
                 actionButton.setText("Connexion");
-                disclaimer.setVisible(false); // Cacher le disclaimer
+                disclaimer.setVisible(false);
                 idField.setHelperText(null);
             }
         });
 
-        // Logique du clic
         actionButton.addClickListener(e -> {
             if (tabs.getSelectedTab().equals(tabLogin)) {
                 login();
@@ -115,10 +133,12 @@ public class PageConnection extends VerticalLayout {
             }
         });
 
-        // Ajout des composants
-        this.add(titre, tabs, disclaimer, idField, mdpField, actionButton);
+        // --- 5. Ajout de la carte au layout principal ---
+        this.add(glassCard);
     }
 
+    // ... Les méthodes login() et register() restent identiques ...
+    
     private void login() {
         String identifiant = idField.getValue();
         String mdp = mdpField.getValue();
@@ -159,45 +179,39 @@ public class PageConnection extends VerticalLayout {
         String identifiant = idField.getValue();
         String mdp = mdpField.getValue();
 
-        // --- 1. Validation des champs vides ---
         if (identifiant.isEmpty() || mdp.isEmpty()) {
             Notification.show("Veuillez remplir tous les champs.");
             return;
         }
 
-        // --- 2. Validation du format Prénom.Nom ---
-        // On vérifie s'il y a un point ET si ce n'est pas au début ou à la fin
         if (!identifiant.contains(".") || identifiant.startsWith(".") || identifiant.endsWith(".")) {
             Notification.show("Refusé : L'identifiant doit être au format 'prénom.nom' !")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
             return;
         }
 
+        boolean existeDeja = false;
         try (Connection con = ConnectionPool.getConnection()) {
-            // Vérifier doublon
             String checkSql = "SELECT id FROM utilisateurs WHERE identifiant=?";
             PreparedStatement checkPst = con.prepareStatement(checkSql);
             checkPst.setString(1, identifiant);
             if (checkPst.executeQuery().next()) {
-                Notification.show("Cet identifiant existe déjà !");
-                return;
+                existeDeja = true;
             }
-            // On vérifie s'il y a un point ET si ce n'est pas au début ou à la fin
-        if (!identifiant.contains(".") || identifiant.startsWith(".") || identifiant.endsWith(".")) {
-            Notification.show("Refusé : L'identifiant doit être au format 'prénom.nom' !")
-                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        } catch (SQLException ex) {
+            Notification.show("Erreur de vérification : " + ex.getMessage());
             return;
         }
-            // Création compte
-            Utilisateur.créerUtilisateur(identifiant, mdp);
-            
-            // Retour à la connexion
-            tabs.setSelectedIndex(0); 
-            mdpField.clear();
-            idField.clear();
 
-        } catch (SQLException ex) {
-            Notification.show("Erreur : " + ex.getMessage());
+        if (existeDeja) {
+            Notification.show("Cet identifiant existe déjà !");
+            return;
         }
+
+        Utilisateur.créerUtilisateur(identifiant, mdp);
+        
+        tabs.setSelectedIndex(0); 
+        mdpField.clear();
+        idField.clear();
     }
 }

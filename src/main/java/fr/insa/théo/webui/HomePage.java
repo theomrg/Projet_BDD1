@@ -50,6 +50,7 @@ import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import fr.insa.théo.model.Joueur;
+import fr.insa.théo.model.Utilisateur;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -80,6 +81,7 @@ public class HomePage extends VerticalLayout{
     private Grid<Equipe> gridEquipes;
     private Grid<Joueur> grilleJoueurs;
     private Grid<Joueur> gridAllJoueurs;
+    private Grid<Utilisateur> gridUsers;
     
     
     public HomePage() {
@@ -173,6 +175,8 @@ public class HomePage extends VerticalLayout{
         detailsJoueur.addClassName("glass-details");
         Details detailsCompo = new Details("🛠️ Composer les équipes",selecteurMatchAlea,boutonAleatoire);
         detailsCompo.addClassName("glass-details");
+        Details detailsid = new Details("🛠️ Getion des identifiants");
+        detailsid.addClassName("glass-details");
         
         
        
@@ -281,6 +285,40 @@ public class HomePage extends VerticalLayout{
         gridAllJoueurs.addColumn(Joueur::getDateNaissance).setHeader("Date de Naissance").setWidth("180px");
         gridAllJoueurs.setHeight("100%");
         gridAllJoueurs.setWidthFull();
+        
+        gridUsers = new Grid<>(Utilisateur.class, false);
+        gridUsers.addClassName("glass-grid-v2");
+        gridUsers.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER);
+        gridUsers.addColumn(Utilisateur::getIdentifiant).setHeader("Identifiant");
+        gridUsers.addColumn(Utilisateur::getRole).setHeader("Rôle");
+        gridUsers.addComponentColumn(user -> {
+            Button btnPromouvoir = new Button("Admin");
+            btnPromouvoir.setIcon(new Icon(VaadinIcon.ARROW_UP));
+            btnPromouvoir.addClassName("bouton-ajout"); // Ou votre style bouton
+            // Si déjà admin, on désactive le bouton
+            if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+                btnPromouvoir.setEnabled(false);
+                btnPromouvoir.setText("Admin");
+                btnPromouvoir.setIcon(new Icon(VaadinIcon.CHECK));
+            } else {
+                // Action au clic
+                btnPromouvoir.addClickListener(e -> {
+                    try {
+                        // Appel de la méthode du modèle
+                        user.devenirAdmin();
+                        Notification.show(user.getIdentifiant() + " est maintenant Administrateur !");
+                        rafraichirToutesLesDonnees(); // Mise à jour visuelle
+                    } catch (SQLException ex) {
+                        Notification.show("Erreur : " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                });
+            }
+            return btnPromouvoir;
+        }).setHeader("Action"); 
+        gridUsers.setWidthFull();
+        gridUsers.setHeight("200px");
+        detailsid.add(gridUsers);
       
         try {
             gridAllJoueurs.setItems(Joueur.getAllPlayers());
@@ -290,7 +328,7 @@ public class HomePage extends VerticalLayout{
         
         
         
-        contenuGauche.add(detailsRonde,detailsMatch,detailsEquipe,detailsJoueur,detailsCompo);
+        contenuGauche.add(detailsRonde,detailsMatch,detailsEquipe,detailsJoueur,detailsCompo,detailsid);
         contenuMid.add(gridAllJoueurs);
         contenuMid2.add(grilleJoueurs,gridEquipes);
         contenuDroit.add(gridRondes,gridMatchs);
@@ -829,6 +867,7 @@ public class HomePage extends VerticalLayout{
             if(gridMatchs != null) gridMatchs.setItems(Match.getAllMatchs());
             if(gridEquipes != null) gridEquipes.setItems(Equipe.getAllTeams());
             if(gridAllJoueurs != null) gridAllJoueurs.setItems(Joueur.getAllPlayers());
+            if(gridUsers != null) gridUsers.setItems(Utilisateur.getAllUtilisateurs());
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -23,9 +23,11 @@ import fr.insa.beuvron.utils.database.ClasseMiroir;
 import fr.insa.beuvron.utils.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -98,5 +100,45 @@ public class Utilisateur extends ClasseMiroir{
             catch (SQLException ex) {
                   Notification.show("problème : " + ex.getMessage()); }
 }
+    
+public static List<Utilisateur> getAllUtilisateurs() throws SQLException {
+        List<Utilisateur> list = new ArrayList<>();
+        String sql = "SELECT * FROM utilisateurs ORDER BY identifiant ASC";
+        
+        try (Connection con = ConnectionPool.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+             
+            while (rs.next()) {
+                Utilisateur u = new Utilisateur(
+                    rs.getString("identifiant"),
+                    rs.getString("mdp"),
+                    rs.getString("role"),
+                    rs.getInt("id")
+                );
+                list.add(u);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Promeut cet utilisateur au rang d'ADMIN en base de données.
+     */
+    public void devenirAdmin() throws SQLException {
+        String sql = "UPDATE utilisateurs SET role = 'ADMIN' WHERE id = ?";
+        
+        try (Connection con = ConnectionPool.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setInt(1, this.getId());
+            pst.executeUpdate();
+            
+            // Mise à jour de l'objet local
+            this.setRole("ADMIN");
+        }
+    }
+ 
+
     
 }

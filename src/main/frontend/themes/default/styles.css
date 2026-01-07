@@ -492,3 +492,29 @@ black-glass-button {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombre réduite */
     background: #000000; /* Devient totalement noir */
 }
+
+/* Conteneur principal style Glassmorphism */
+.glass-card {
+    background-color: rgba(255, 255, 255, 0.15); /* Fond légèrement plus transparent */
+    backdrop-filter: blur(15px);                 /* Flou d'arrière-plan plus prononcé */
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.4);  /* Bordure blanche subtile */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Belle ombre portée */
+    border-radius: 20px;                         /* Coins bien arrondis */
+    padding: 40px;                               /* Espace intérieur confortable */
+    
+    /* Centrage et disposition du contenu de la carte */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;                                   /* Espace entre les éléments */
+    max-width: 450px;                            /* Largeur max pour ne pas être trop large */
+    width: 100%;
+}
+
+/* On s'assure que le titre dans la carte est bien visible */
+.glass-card h1 {
+    margin-top: 0;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
